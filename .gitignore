@@ -5,6 +5,7 @@
 
 ## Ignore temporary book rendering
 main.pdf
+0*.pdf
 
 ## Ignore code directory
 code/
