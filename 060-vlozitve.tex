@@ -1,25 +1,26 @@
 \chapter{Dvodimenzionalne vložitve podatkov}
 
-Nadomestni naslov tega poglavja bi lahko bil ``podatkovne karte'', saj v njem opišemo tehnike, ki podatke preslikajo na dvodimenzionalno ravnino, kjer so posamezni primeri točke in kjer lahko iz oddaljenosti med točkami sklepamo o odnosih med primeri oziroma o razdaljah v njihovem originalnem prostoru. A bi s tem opisom morali med take pristope šteti že metodo glavnih komponent. Tako pa smo se zatekli k drugačnemu naslovu, in tu govorimo o vložitvah podatkov v nižjedimenzionalne prostore, oziroma kar v dvodimenzionalne ravnine, saj nas prvenstveno zanimajo vizualizacije podatkovnega prostora. 
+V tem poglavju obravnavamo metode, ki primere vložijo v dvodimenzionalni prostor, tako da geometrijski odnosi med točkami čim bolje odražajo odnose med primeri v izvirnem prostoru. Takšne vložitve uporabljamo predvsem za prikaz strukture podatkov v namene odkrivanja zanimivih vzorcev in skupin, pa tudi v namene rangiranja in odkrivanja odnosov med posameznimi primeri iz učne množice.
 
-Potem analiza glavnih komponent ni vložitev podatkov? Ne, ni. Metoda glavnih komponent je projekcijska metoda, ki oblikuje matematični predpis, recimo \( U \) (matrika, sestavljena iz smernih vektorjev glavnih komponent \( u_1 \) in \( u_2 \)), ki podatke \( X \) projicira v dve dimenziji, torej \( Z = XU \). Projekcija, v splošnem, ni vložitev. Za vložitve, ki jih bomo opisali v tem poglavju, bomo namreč predpisali kriterijsko funkcijo, kateri bodo morale točke zadostiti, in pri tem ne bomo iskali matematične preslikave \( f(x) \), ampak le optimalno postavitev točk \( y_1, \dots, y_n \in \mathbb{R}^2 \).
+Analiza glavnih komponent, o kateri smo govorili v prejšnjem poglavju, ni vložitev v istem smislu kot metode, obravnavane v tem poglavju. Metoda glavnih komponent je projekcijska metoda, ki oblikuje matematični predpis, recimo \( U \) (matrika, sestavljena iz smernih vektorjev glavnih komponent \( u_1 \) in \( u_2 \)), ki podatke \( X \) projicira v dve dimenziji, torej \( Z = XU \). Projekcija v splošnem ni isto kot vložitev. Pri PCA iščemo preslikavo \( f(x) \), ki podatke projicira v nov koordinatni sistem, pri metodah, obravnavanih v tem poglavju, pa iščemo neposredno postavitev točk \( y_1, \dots, y_n \in \mathbb{R}^2 \),
 %
 \marginnote{Oznaka $y_i$ tu ne predstavlja razreda (kot pri napovednih modelih), temveč koordinate točke v vložitvi primera $x_i$ oziroma položaj tega primera v dvodimenzionalnem prostoru.}
 %
-ki minimizira izbrano kriterijsko funkcijo. Takšna postavitev je določena neposredno na ravni medsebojnih odnosov med primeri, na primer njihovih razdalj ali podobnosti, in praviloma ne omogoča enostavne preslikave novih podatkov v isti prostor. V tem smislu vložitve ne gradijo novega koordinatnega sistema, temveč predvsem vizualno predstavitev strukture podatkov.
+ki čim bolje ohranja izbrane odnose med primeri. Zato takšne metode praviloma ne podajo enostavne preslikave za nove podatke v isti prostor.
 
-Ogledali si bomo tri tehnike vložitev: prvo, ki je pomembna tudi z zgodovinskega vidika razvoja tega področja, drugo, ki je v zadnjem času pridobila veliko priljubljenost (tako metoda kot njen avtor), in tretjo, ki izhaja iz tehnik vizualizacije omrežij. Videli bomo, da kljub popolnoma različnim kriterijskim funkcijam te metode na manjših podatkovnih množicah pogosto vodijo do zelo podobnih rezultatov. Pri velikih podatkih, z mnogo primeri in iz visokorazsežnih prostorov, pa se razlike med metodami lahko izrazito povečajo.
+Ogledali si bomo tri pristope k dvodimenzionalnim vložitvam podatkov: večrazsežno lestvičenje (MDS), metodo t-SNE in vložitve s silami. Prva je pomembna z zgodovinskega vidika, druga poudarja lokalno strukturo podatkov, tretja pa izhaja iz vizualizacije omrežij. Pri majhnih podatkovnih množicah so lahko vložitve MDS, t-SNE in metod s silami podobne, pri večjih in visokorazsežnih podatkih pa pridejo razlike med pristopi precej bolj do izraza.
 
 Skupen vsem trem opisanim metodam je osnovni pristop vložitve primerov v dve dimenziji. Uporabili bomo kriterijsko funkcijo, ki izhaja iz razdalj med primeri v izvornem prostoru in jih na ustrezen način poveže s položaji točk v vložitvenem prostoru. Začetno vložitev dobimo tako, da točke (primere) v ravnini razporedimo naključno, nato pa njihove položaje postopoma popravljamo v smeri gradienta kriterijske funkcije glede na koordinate teh točk. Tokrat torej model ne predstavljajo uteži ali parametri preslikave, temveč kar same koordinate točk v vložitvi, zato je število parametrov enako $2n$, kjer je $n$ število primerov.
 
 \section{Podatki}
 
+
 Začnimo kar s podatki.
 %
-\marginnote{Lahko bi seveda tudi pričeli s primeri v atributnem zapisu, a bi potem morali uporabiti neko mero razdalje. Plus, očitno lahko, kot bomo počeli v tem poglavju, podatke predstavimi samo z razdaljami med njimi. So lahko taki podatki vhod v PCA?}
+\marginnote{Podatke lahko v tem poglavju opišemo zgolj z razdaljami med primeri, brez eksplicitnega atributnega zapisa. Tak opis pa ni neposreden vhod za PCA, saj ta metoda potrebuje predstavitev primerov z atributi.}
 %
-Vse metode, ki jih bomo obravnavali v tem poglavju, na vhodu prejmejo razdalje med primeri. Tokrat primerov torej ne bomo opisovali eksplicitno z atributi,
-kot smo bili vajeni v prejšnjih poglavjih, temveč zgolj z razdaljami med njimi. Te razdalje bi običajno zapisali v (simetrični) matriki, lahko pa jih predstavimo tudi s spodnjim slovarjem:
+
+Vse metode, ki jih bomo v tem poglavju predstavili, lahko izhajajo iz razdalj ali podobnosti med primeri. Predpostavili bomo, da so ti odnosi že podani. Tokrat primerov torej ne bomo opisovali eksplicitno z atributi, kot smo bili vajeni v prejšnjih poglavjih, temveč zgolj z razdaljami med njimi. Te razdalje bi običajno zapisali v (simetrični) matriki, lahko pa jih predstavimo tudi s spodnjim slovarjem:
 
 \vspace*{3mm}
 \begin{lstlisting}
@@ -140,17 +141,26 @@ Malce je zasukana in narobe obrnjena, a kdo pravi, da mora biti sever na vrhu in
 
 \begin{marginfigure}
     \includegraphics[width=\linewidth]{figs/060-mds-cities.pdf}
-    \caption{Dvodimenzionalna vložitev z večrazrednim lestvičenjem.}
+    \caption{Dvodimenzionalna vložitev z večrazsežnim lestvičenjem.}
     \label{fig:mds}
 \end{marginfigure}
 
 Opozorilo sicer: MDS-vložitev z enako dobro vrednostjo kriterijske funkcije $J(Y)$ je nešteto. Pri nespremenjeni vrednosti kriterijske funkcije vložitve lahko poljubno rotiramo in zrcalimo. Vse te transformacije ohranjajo razdalje in pravzaprav samo te nastopajo v kriterijski funkciji. Dobljene osi zato nimajo pomena in jih kot takih ne moremo povezati s kakšno razlago. Drugače kot pri PCA torej. A spomnimo: pri PCA izhajamo iz atributno predstavljenih primerov, tu pa, pri MDS, iz razdalj.
 
+\begin{exercise}{Koliko razdalj potrebujemo za zemljevid?}
+Vzemi podatke o slovenskih mestih iz poglavja. Najprej uporabi vse podane razdalje in z MDS rekonstruiraj zemljevid. Nato naključno odstranjuj vedno več razdalj (npr.\ 10\%, 25\%, 50\%, 75\%) in opazuj, kako se spreminja kakovost vložitve. Kdaj postane problem premalo določen? Ali obstajajo razdalje, katerih odstranitev bistveno bolj škodi kot odstranitev drugih? Kakovost vložitve lahko opazuješ izkustveno, s karto, lahko pa uporabiš tudi isto metriko kot pri ocenjevanju izgube pri MDS, le da to oceno izračunaš iz celotne množice podatkov (torej ne samo iz te, iz katerih iz vzorčil učno množico).
+\end{exercise}
+
+\begin{exercise}{Odpornost vložitev na šum.}
+    Na podatkih o cestnimi razdaljami slovenskih mest izberi eno od razdalj ter njej umetno dodaj veliko napako (npr.\ razdaljo Ljubljana--Koper povečaj za 100~km). Nato ponovno izračunaj MDS-vložitev in primerjaj položaje mest pred in po spremembi. Poskus ponovi za več velikosti napake in kasneje na več različnih parov mest. Kako se na napake odziva večrazredno lestvičenje? Katere napačne meritve najbolj pokvarijo vložitev?
+\end{exercise}
+    
+
 \section{Vložitve sosedov}
 
-Večrazredno lestvičenje ima skriti problem: kriterijska funkcija kvadrira razliko razdalj iz vhodnih podatkov in vložitvenega prostora. Učenje modela z gradientnim sestopom se bo zato bolj ``potrudilo'' pri zmanjševanju večjih odstopanj. Če odstopanja merimo v deležih, na primer v odstotkih, in če na primer na vložitvi razdalje odstopajo od vhodnih za $10\%$, bo odstopanje med Ljubljano in Kranjem imelo dosti manjši vpliv na učenje kot odstopanje med Koprom in Mariborom. MDS torej teži k ohranjanju predvsem tistih večjih razdalj. Vpliv krajših razdalj med sosednjimi primeri je veliko manjši.
+Večrazsežno lestvičenje ima skriti problem: kriterijska funkcija kvadrira razliko razdalj iz vhodnih podatkov in vložitvenega prostora. Učenje modela z gradientnim sestopom se bo zato bolj ``potrudilo'' pri zmanjševanju večjih odstopanj. Če odstopanja merimo v deležih, na primer v odstotkih, in če na primer na vložitvi razdalje odstopajo od vhodnih za $10\%$, bo odstopanje med Ljubljano in Kranjem imelo dosti manjši vpliv na učenje kot odstopanje med Koprom in Mariborom. MDS torej teži k ohranjanju predvsem tistih večjih razdalj. Vpliv krajših razdalj med sosednjimi primeri je veliko manjši.
 
-Ohranjanje večjih razdalj je seveda zaželeno, če želimo pridobiti podatkovne karte s primernimi globalnimi ureditvami. A mnogokrat nas pri podatkovni analitiki zanimajo predvsem soseščine in na podatkovnih kartah morda iščemo samo skupine podatkov ter jih skušamo interpretirati, pri čemer nas globalni odnosi oziroma skupine, ki so oddaljene druga od druge, ne zanimajo. Tako bi nas zanimale vizualizacije, kjer so izražene skupine primerov, ki so si med sabo podobni, in nas sama interpretacija razdalje med skupinami, ki so si med seboj oddaljene, ne zanima. Taka vizualizacija je na primer prikazana na sliki~\ref{fig:tsne} na desni strani in je očitno zelo različna od vizualizacije istih podatkov, kot jo pridela MDS.
+Ohranjanje večjih razdalj je seveda zaželeno, če želimo pridobiti podatkovne karte s primernimi globalnimi ureditvami. A mnogokrat nas pri podatkovni analitiki zanimajo predvsem soseščine in na podatkovnih kartah morda iščemo samo skupine podatkov ter jih skušamo interpretirati, pri čemer nas globalni odnosi oziroma skupine, ki so oddaljene druga od druge, ne zanimajo. Tako bi nas zanimale vizualizacije, kjer so izražene skupine primerov, ki so si med sabo podobni, in nas sama interpretacija razdalje med skupinami, ki so si med seboj oddaljene, ne zanima. Taka vizualizacija je na primer prikazana na sliki~\ref{fig:mds-tsne} na desni strani in je očitno zelo različna od vizualizacije istih podatkov, kot jo pridela MDS.
 
 \begin{figure}
     \centering
@@ -161,11 +171,9 @@ Ohranjanje večjih razdalj je seveda zaželeno, če želimo pridobiti podatkovne
     \fbox{%
         \includegraphics[width=0.45\textwidth]{figs/060-t-sne-bone-marrow.pdf}
     }
-    \caption{Primerjava vložitev MDS (levo) in t-SNE (desno) na podatki o izražanju genov v celicah kostnega mozga (vzorec tisoč celic in izrazi tisoč genov). Skupine točk naj bi pripadale posameznim celičnim tipom.}
+    \caption{Primerjava vložitev MDS (levo) in t-SNE (desno) na podatkih o izražanju genov v celicah kostnega mozga (vzorec tisoč celic in izrazi tisoč genov). Skupine točk naj bi pripadale posameznim celičnim tipom.}
     \label{fig:mds-tsne}
 \end{figure}
-
-Zanima nas torej ohranjanje soseščine. Za to potrebujemo mero, ki pove, kako blizu so si primeri v izvornem prostoru, in mero, ki pove, kako blizu so si v prostoru vložitev. Ti meri morata zanemariti primere, ki so si daleč, in se osredotočiti le na bližnje primere. Tu lahko uporabimo trik: namesto razdalje bomo ocenili verjetnost, da sta si dva primera blizu, v izvornem prostoru in prostoru vložitev, kot kriterijsko funkcijo pa ocenili podobnost med tema vektorjema verjetnosti, kjer z vektorjema mislimo seznama verjetnosti bližine vseh parov primerov.
 
 Zanima nas torej ohranjanje soseščine. Za to potrebujemo mero, ki pove, kako blizu so si primeri v izvornem prostoru, in mero, ki pove, kako blizu so si v prostoru vložitev. Ti meri morata zanemariti primere, ki so si daleč, in se osredotočiti le na bližnje primere. Tu lahko uporabimo trik: namesto razdalje bomo ocenili verjetnost, da sta si dva primera blizu, v izvornem prostoru in prostoru vložitev, kot kriterijsko funkcijo pa ocenili podobnost med tema vektorjema verjetnosti, kjer z vektorjema mislimo seznama verjetnosti bližine vseh parov primerov.
 
@@ -173,33 +181,33 @@ Lotimo se tega bolj formalno. Kot pri MDS naj bo $x_i$ primer v izvornem prostor
 \[
 p_{j|i} = \frac{\exp\!\left(-\frac{\|x_i - x_j\|^2}{2\sigma_i^2}\right)}{\sum_{k \ne i} \exp\!\left(-\frac{\|x_i - x_k\|^2}{2\sigma_i^2}\right)}.
 \]
-Ta verjetnost pove, kako verjetno bi izbrali primer $j$ kot soseda primera $i$. Pri tem parameter $\sigma_i$ določa ``širino'' okolice okoli $x_i$. Ker pričakujemo, da je funckcija $p_{j|i}$ simetrična, torej, da, velja $p_{j|i}=p_{i|j}$, združimo obe verjetnosti v njuno povprečje in normaliziramo:
+Ta verjetnost pove, kako verjetno bi izbrali primer $j$ kot soseda primera $i$. Pri tem parameter $\sigma_i$ določa ``širino'' okolice okoli $x_i$. Ker pogojne verjetnosti \( p_{j \mid i} \) na splošno niso simetrične, torej praviloma ne velja \( p_{j \mid i} = p_{i \mid j} \), ju pri t-SNE združimo v simetrično skupno verjetnost
 \[
-p_{ij} = \frac{p_{j|i} + p_{i|j}}{2n},
+p_{ij} = \frac{p_{j \mid i} + p_{i \mid j}}{2n},
 \]
-kjer je $n$ število vseh primerov.
+kjer je \( n \) število vseh primerov.
 
 V prostoru vložitev podobno določimo verjetnosti bližine, vendar uporabimo porazdelitev z debelejšimi repi (Studentovo $t$-porazdelitev z eno stopnjo prostosti):
 \[
 q_{ij} = \frac{\left(1 + \|y_i - y_j\|^2\right)^{-1}}{\sum_{k \ne l} \left(1 + \|y_k - y_l\|^2\right)^{-1}}.
 \]
-Ta izbira omogoča, da so oddaljeni primeri v vložitvi še vedno dovolj ``ločeni'' in se ne zlepijo skupaj.
+Ta izbira zmanjša problem zgoščanja, saj omogoča izrazitejšo predstavitev večjih razdalj v vložitvi kot pri Gaussovi porazdelitvi.
 
 Cilj tega pristopa je poiskati takšne vložitve $y_i$, da so porazdelitve $p_{ij}$ in $q_{ij}$ čim bolj podobne. To dosežemo z minimizacijo Kullback-Leiblerjeve divergence:
 \[
-\mathcal{L(y)} = \sum_{i \ne j} p_{ij} \log \frac{p_{ij}}{q_{ij}}.
+\mathcal{L}(Y) = \sum_{i \ne j} p_{ij} \log \frac{p_{ij}}{q_{ij}}.
 \]
 Ta kriterijska funkcija kaznuje predvsem primere, kjer sta si točki v izvornem prostoru blizu (velik $p_{ij}$), v vložitvi pa daleč narazen (majhen $q_{ij}$), zato spodbuja ohranjanje lokalne strukture podatkov.
 
 Kriterijsko funkcijo,
 %
-\marginnote{Metodo SNE sta predlagala Geoffrey E. Hinton in Sam T. Roweis (2002), t-SNE pa Hinton in Laurens van der Maaten (2008). Hinton je tudi eden od očetov sodobne umetne inteligence je leta 2024 za svoje raziskovalno delo prejel Nobelovo nagrado.}
+\marginnote{Metodo SNE sta predlagala Geoffrey E. Hinton in Sam T. Roweis (2002), t-SNE pa Hinton in Laurens van der Maaten (2008). Hinton je tudi eden od očetov sodobne umetne inteligence in je leta 2024 za svoje raziskovalno delo prejel Nobelovo nagrado.}
 %
-kot je določena zgoraj, uporablja metoda t-SNE (angl.~\emph{t-distributed Stochastic Neighbor Embedding}). Ta pristop je nadgradil starejšo metode SNE, ki je prav tako temeljila na primerjavi verjetnostnih porazdelitev bližin med pari primerov v izvornem prostoru in prostoru vložitev. A je imel SNE nekaj pomembnih pomanjkljivosti. Prvič, uporabljal je nesimetrične verjetnosti $p_{j|i}$ in $q_{j|i}$, kar je otežilo optimizacijo in interpretacijo. Drugič, zaradi uporabe Gaussove porazdelitve tudi v prostoru vložitev je trpel za t.~i.\ problemom ``zgoščanja'' (angl.~\emph{crowding problem}), kjer se večje razdalje težko ustrezno predstavijo v nizkodimenzionalnem prostoru, zato se točke pogosto preveč nagnetejo skupaj.
+kot je določena zgoraj, uporablja metoda t-SNE (angl.~\emph{t-distributed Stochastic Neighbor Embedding}). Ta pristop je nadgradil starejšo metodo SNE, ki je prav tako temeljila na primerjavi verjetnostnih porazdelitev bližin med pari primerov v izvornem prostoru in prostoru vložitev. A je imel SNE nekaj pomembnih pomanjkljivosti. Prvič, uporabljal je nesimetrične verjetnosti $p_{j|i}$ in $q_{j|i}$, kar je otežilo optimizacijo in interpretacijo. Drugič, zaradi uporabe Gaussove porazdelitve tudi v prostoru vložitev je trpel za t.~i.\ problemom ``zgoščanja'' (angl.~\emph{crowding problem}), kjer se večje razdalje težko ustrezno predstavijo v nizkodimenzionalnem prostoru, zato se točke pogosto preveč nagnetejo skupaj.
 
-Metoda t-SNE odpravi te težave. Uvede simetrične verjetnosti $p_{ij}$ in $q_{ij}$, kar poenostavi kriterijsko funkcijo in v prostoru vložitev uporabi Studentovo $t$-porazdelitev z enim prostostnim parametrom, ki ima daljši rep kot Gaussova porazdelitev. To omogoča, da so si oddaljeni primeri v vložitvi bolj naravno razmaknjeni, s čimer se zmanjša problem zgoščanja in izboljša prikaz lokalne strukture podatkov.
+Metoda t-SNE odpravi glavni pomanjkljivosti metode SNE na dva načina: uporabi simetrično podobnost \( p_{ij} \) in v prostoru vložitve uvede Studentovo \( t \)-porazdelitev.
 
-Prestavimo sedaj zgornje matematične izraze v kodo. Znova je vse, kar potrebujemo, razred, ki zgradi računski graf za kriterijsko funkcijo. Neverjetno, kaj vse lahko pričnemo s pristopom strojnega odvajanje, kajne?
+V nadaljevanju ne bomo implementirali celotne standardne različice metode t-SNE, temveč poenostavljeno različico, ki ohrani osnovno idejo: bližnji pari v izvornem prostoru naj imajo visoko verjetnost tudi v prostoru vložitve, kriterijska funkcija pa naj meri razliko med obema porazdelitvama. 
 
 \vspace*{3mm}
 \begin{lstlisting}
@@ -249,9 +257,18 @@ class tSNE:
         return loss
 \end{lstlisting}
 
-Razred `tSNE` v konstruktorju `\_\_init\_\_` najprej za vsak primer naključno inicializira dvodimenzionalno vložitev `self.pos`. Metoda `p\_distribution` iz podanih razdalj v izvornem prostoru izračuna porazdelitev podobnosti $p_{ij}$ tako, da vsako razdaljo pretvori v utež z Gaussovo funkcijo in nato vse uteži normalizira v verjetnosti. Za prostor vložitev metoda `sqdist` izračuna kvadrat evklidske razdalje, `q\_distribution` pa to uporabi tako da iz trenutnih položajev točk izračuna porazdelitev $q_{ij}$. Pri tem uporabi jedro oblike $(1+|y_i-y_j|^2)^{-1}$. Kriterijsko funkcijo smo implementirali v metodi `loss`, ki najprej določi porazdelitvi `p` in `q`, potem pa za izračun Kullback-Leiblerjeve divergence za vse pare sešteje $p_{ij}\log(p_{ij}/q_{ij})$.
+Razred `tSNE` v konstruktorju `\_\_init\_\_` najprej za vsak primer naključno inicializira dvodimenzionalno vložitev `self.pos`. Metoda `p\_distribution` iz podanih razdalj v izvornem prostoru izračuna porazdelitev podobnosti $p_{ij}$ tako, da vsako razdaljo pretvori v utež z Gaussovo funkcijo in nato vse uteži normalizira v verjetnosti. Za prostor vložitev metoda `sqdist` izračuna kvadrat evklidske razdalje, `q\_distribution` pa to uporabi tako da iz trenutnih položajev točk izračuna porazdelitev $q_{ij}$. Pri tem uporabi jedro oblike
+\[
+(1 + \|y_i - y_j\|^2)^{-1}.
+\]
+Kriterijsko funkcijo smo implementirali v metodi `loss`, ki najprej določi porazdelitvi `p` in `q`, potem pa za izračun Kullback-Leiblerjeve divergence za vse pare sešteje $p_{ij}\log(p_{ij}/q_{ij})$.
 
-Tu velja opozoriti, da smo zgoraj predstavili poenostavljeno različico metode t-SNE. Avtorji izvorne rešitve so namreč predlagali, da se širina Gaussove porazdelitve $\sigma_i$ ne določi vnaprej in za vse točke enako, ampak ta parameter, ki določa mero razpršenosti, za vsak primer posebej prilagodimo tako, ki nadzoruje velikost lokalne soseščine (angl. \emph{perpleksnost}). Prav tako se pogosto uporablja dodatne izboljšave optimizacije, kot so zgodnje pretiravanje (angl.~\emph{early exaggeration}), kjer v začetnih iteracijah umetno povečamo vrednosti verjetnosti $p_{ij}$ (tipično jih pomnožimo z neko konstanto). S tem okrepimo privlačne sile med bližnjimi točkami, zato se skupine podatkov najprej jasno oblikujejo in ločijo med seboj, še preden začne optimizacija natančneje uravnavati njihove medsebojne razdalje. Po nekaj korakih ta učinek izklopimo, kar omogoči stabilnejše končno razporejanje točk.
+Tu uporabljamo poenostavljeno različico metode t-SNE. V standardni izvedbi se širina Gaussovega jedra ne določi z enim samim parametrom, temveč se za vsako točko posebej prilagodi tako, da ustreza izbrani perpleksnosti (angl.~\emph{perplexity}). Pogosto se uporablja tudi zgodnje pretiravanje (angl.~\emph{early exaggeration}), pri katerem v začetnih iteracijah povečamo vrednosti $p_{ij}$ in s tem poudarimo oblikovanje lokalnih skupin.
+
+\marginnote{V naši poenostavljeni implementaciji parameter $\sigma$ nadomesti perpleksnost standardnega t-SNE. Ta poskus eksperimentalno pokaže njegovo vlogo: z njim uravnavamo, koliko lokalne ali globalne strukture vložitev ohranja.}
+\begin{exercise}{Kakšna je vloga parametra $\sigma$?}
+Na podatkih z več jasno ločenimi skupinami izvedi t-SNE za različne vrednosti $\sigma$. Opazuj, kako se spreminja oblika vložitve. Pri majhnih vrednostih bo metoda poudarjala zelo lokalne sosede, pri velikih pa se bo približevala globalni strukturi. Poskusi najti vrednost, pri kateri so skupine najbolj jasno ločene.
+\end{exercise}
 
 Uporaba zgornje implementacije od tu dalje ni prav nič drugačna kot za MDS:
 \vspace*{3mm}
@@ -260,18 +277,24 @@ model = tSNE(items, sigma=40.0)
 model = train(model, pairs, targets, 
               n_epochs=3000, learning_rate=0.05, report_every=100)
 \end{lstlisting}
-Tudi tu so na vhodu razdalje, na izhodu pa vložitve primerov. Te znova lahko prikažemo na razsevnem diagramu (slika~\ref{fig:mds}). Hm. Vložitev ni prav dosti drugačna od te pri MDS. Kar je sicer zanimivo, saj gre za metodi, ki imata popolnoma drugačno kriterijsko funkcijo. Razlike med MDS in t-SNE res nastopijo, ko je podatkov več, in ko ti prihajajo iz mnogodimenzionalnih prostorov. V visokih dimenzijah se evklidske razdalje ``zgoščajo'', kar pomeni, da postanejo razlike med bližnjimi in daljnimi primeri manj izrazite, zato globalna struktura izgubi pomen, lokalne soseščine pa postanejo ključne. Pri večjem številu podatkov pa je tudi lokalna struktura bogatejša in bolj zanesljiva, zato jo lahko t-SNE učinkoviteje izpostavi, medtem ko MDS še vedno poskuša ohraniti globalne razdalje in s tem ``zgladi'' te lokalne vzorce. Primer take, zelo različne vložitve kaže slika~\ref{fig:mds-tsne}, kjer je pri MDS težko med sabo ločiti skupine, ki so jasno razvidne v viuzaliacije vložitev t-SNE.
+Tudi tu so na vhodu razdalje, na izhodu pa vložitve primerov. Te znova lahko prikažemo na razsevnem diagramu (slika~\ref{fig:tsne}). Dobljena vložitev ni bistveno drugačna od tiste pri MDS. Kar je sicer zanimivo, saj gre za metodi, ki imata popolnoma drugačno kriterijsko funkcijo. Razlike med MDS in t-SNE se zares pokažejo pri večjih in visokorazsežnih podatkih. Tam je lokalna soseščina pogosto informativnejša od globalne geometrije, zato t-SNE bolje izpostavi skupine podobnih primerov, medtem ko MDS še naprej sledi predvsem globalnim razdaljam. Primer take, zelo različne vložitve kaže slika~\ref{fig:mds-tsne}, kjer je pri MDS težko med sabo ločiti skupine, ki so jasno razvidne v prikazu vložitev t-SNE.
+
+\marginnote{Pri majhnih množicah, kot so mesta v tem poglavju, sta vložitvi MDS in t-SNE pogosto skoraj enaki, zato razlika med globalno in lokalno strukturo ostane abstraktna. Poskus na visokorazsežnih podatkih to ilustrira neposredno: ko skupine v izvornem prostoru približujemo, MDS zlije vložitev, t-SNE pa naj bi ohranjal ločene gruče.}
+\begin{exercise}{Kaj vidi posamezna metoda?}
+Na majhnih množicah sta MDS in t-SNE pogosto podobni; zato ustvari tri dobro ločene skupine točk v desetdimenzionalnem prostoru, izračunaj vse medsebojne razdalje in jih vloži z MDS ter t-SNE. Nato postopoma zmanjšuj razdaljo med skupinami. Primerjaj, pri kateri stopnji prekrivanja posamezna metoda še uspe ločiti skupine. Kaj ohranja MDS in kaj ohranja t-SNE?
+\end{exercise}
+
 \begin{marginfigure}
     \includegraphics[width=\linewidth]{figs/060-tsne-mesta.pdf}
-    \caption{Dvodimenzionalna vložitev z večrazrednim lestvičenjem.}
-    \label{fig:mds}
+    \caption{Dvodimenzionalna vložitev s t-SNE.}
+    \label{fig:tsne}
 \end{marginfigure}
 
 \section{Vložitve s silami}
 
-Oglejmo si še tretji pristop. Podamo ga zato, ker je znova skoraj popolnoma  drugačen od prejšnjih dveh, in ker je silno znan na področju vizualizacije omrežij. Pristop predpostavi, da so primeri točke, med katerimi delujejo sile. Pari primerov, za katere poznamo razdalje,
+Oglejmo si še tretji pristop. Obravnavamo ga zato, ker se po izhodišču precej razlikuje od prejšnjih dveh in ker je zelo uveljavljen na področju vizualizacije omrežij. Pristop predpostavi, da so primeri točke, med katerimi delujejo sile. Pari primerov, za katere poznamo razdalje,
 %
-Tu smo odprli še en nov koncept: do sedaj so podatki, pač tako je naneslo, vsebovali razdalje med vsemi primeri. A teh, za delovanje naših metod, sploh ne potrebujemo. Nekoliko več o tem v nadaljevanju.
+Tu uvedemo še pomembno razliko glede na prejšnje primere: doslej smo obravnavali podatke, pri katerih so bile razdalje podane za vse pare primerov, kar pa za metode s silami ni nujno. Pogosto namreč zadošča, da poznamo razdalje ali povezave le za izbrane pare.
 %
 povežemo z ``vzmetmi'', ki skušajo ohranjati predpisano dolžino, hkrati pa med vsemi pari deluje še odbojna sila, ki preprečuje, da bi se točke preveč zgostile. Položaj točk v ravnini nato dobimo z iskanjem ravnovesja sil, ki ga poiščemo z minimizacijo ustrezne energijske funkcije. Čeprav je tak pristop bil razvit na področju vizualizacije omrežij, kjer želimo pregledno razporediti vozlišča grafa, ga enako uspešno uporabimo tudi za vložitve podatkov.
 
@@ -283,34 +306,26 @@ kjer $E$ označuje množico parov z znanimi razdaljami. Ta člen sili povezane p
 
 Med vsemi pari primerov hkrati deluje še odbojna sila, ki jo opišemo z energijo
 \[
-E_{\text{odboj}} = \frac{1}{\binom{n}{2}} \sum_{i<j} \frac{C}{\|y_i - y_j\|},
+E_{\text{odboj}} = \frac{1}{\binom{n}{2}} \sum_{i<j} \frac{1}{\|y_i - y_j\|},
 \]
-kjer konstanta $C$ določa jakost odboja. Ta člen preprečuje, da bi se točke preveč približale.
 
-Ker želimo preprečiti, da bi celotna konfiguracija ``odplavala'' stran od izhodišča, dodamo še šibek centrirni člen
+Skupno energijo zapišemo kot vsoto obeh členov
 \[
-E_{\text{center}} = \frac{\lambda}{n} \sum_{i=1}^n \|y_i\|^2,
+E = E_{\text{vzmeti}} + C \, E_{\text{odboj}},
 \]
-kjer $\lambda$ določa njegovo jakost.
-
-Skupno energijo zapišemo kot vsoto vseh treh členov
-\[
-E = E_{\text{vzmeti}} + E_{\text{odboj}} + E_{\text{center}},
-\]
-in poiščemo takšne položaje točk $y_i$, ki to energijo minimizirajo.
+kjer konstanta \(C\) določa relativni vpliv odbojnega člena. Rešitev so takšni položaji točk $y_i$, ki to skupno energijo minimizirajo.
 
 Zgornja kriterijska funkcija je na prvi pogled še najbolj podobna tej, ki jo uporablja MDS. A podobnost je zgolj navidezna in velja le, ko so razdalje podane za vse pare. Pri MDS en sam člen enakovredno obravnava vse pare primerov in skuša globalno ohraniti vse razdalje. Pri silno vodenih vložitvah pa se kriterijska funkcija razcepi na več delov: vzmeti delujejo le med izbranimi pari (npr.\ povezanimi v omrežju) in skrbijo za lokalno strukturo, odboj pa deluje med vsemi pari in preprečuje zgoščanje točk. S tem dobimo ravnovesje med lokalnim ohranjanjem razdalj in globalnim razmikom točk, kar vodi do bistveno drugačnih vložitev kot pri MDS.
 
-Tokrat je implementacijska koda, pač zaradi treh členov kriterijske funkcije, malce daljša:
+Tokrat je implementacijska koda, pač zaradi dveh členov kriterijske funkcije in potrebnih normalizacij, malce daljša:
 
 \vspace*{3mm}
 \begin{lstlisting}
 class ForceDirectedLayout:
-    def __init__(self, items, repulsion_strength=5000.0, center_strength=0.001):
+    def __init__(self, items, rep_strength=5000.0):
         random.seed(100)
         self.items = sorted(items)
-        self.repulsion_strength = repulsion_strength
-        self.center_strength = center_strength
+        self.rep_strength = rep_strength
 
         self.pos = {
             i: [Value(random.uniform(-1, 1)) for _ in range(2)]
@@ -327,40 +342,108 @@ class ForceDirectedLayout:
 
     def loss(self, edges, target_lengths):
         # springs between connected pairs
-        spring_loss = Value(0.0)
-        n_edges = len(edges)
+        E = edges
+        L = target_lengths
+        spring = Value(0.0)
+        nE = len(E)
 
-        for (a, b), target in zip(edges, target_lengths):
+        for (a, b), t in zip(E, L):
             dist = self.d(a, b)
-            spring_loss += (dist - Value(target)) ** 2
+            spring += (dist - Value(t)) ** 2
 
-        spring_loss = spring_loss / Value(n_edges)
+        spring = spring / Value(nE)
 
         # repulsion between all pairs
-        repulsion_loss = Value(0.0)
-        n = len(self.items)
-        repulsion_count = 0
+        rep = Value(0.0)
+        N = len(self.items)
+        cnt = 0
 
-        for i in range(n):
-            for j in range(i + 1, n):
+        for i in range(N):
+            for j in range(i + 1, N):
                 a = self.items[i]
                 b = self.items[j]
                 dist = self.d(a, b)
-                repulsion_loss += Value(self.repulsion_strength) / dist
-                repulsion_count += 1
+                rep +=  dist ** (-1)
+                cnt += 1
 
-        repulsion_loss = repulsion_loss / Value(repulsion_count)
-
-        # centering loss
-        center_loss = Value(0.0)
-        for city in self.items:
-            x, y = self.pos[city]
-            center_loss += x * x + y * y
-
-        center_loss = Value(self.center_strength) * center_loss / Value(n)
-
-        return spring_loss + repulsion_loss + center_loss
+        rep = rep * self.rep_strength / cnt
+        
+        return spring + rep
 \end{lstlisting}
 
-Na prav enak način kot pri MDS in t-SNE pridobimo tudi vložitve s silami. Tudi tu je konvergenca hitra, dobljena vizualiza
-Vložitve tudi tokrat niso prav 
+Na prav enak način kot pri MDS in t-SNE pridobimo tudi vložitve s silami. Tudi tu je konvergenca hitra, dobljena vizualizacija pa presenetljivo podobna tistim, ki jih dobimo s prejšnjima metodama:
+\vspace*{3mm}
+\begin{lstlisting}
+model = ForceDirectedLayout(items, rep_strength=5000.0)
+model = train(model, pairs, targets, n_epochs=3000,
+    learning_rate=0.05, report_every=100)
+\end{lstlisting}
+
+Če želimo dodatno preprečiti, da bi celotna konfiguracija ``odplavala'' stran od izhodišča, dodamo še šibek centrirni člen
+\marginnote{Smo tak centrirni člen v prejšnjih poglavjih že omenjali? Na primer pri linearni regresiji? Regularizacija!}
+\[
+E_{\text{center}} = \frac{1}{n} \sum_{i=1}^n \|y_i\|^2,
+\]
+Skupno energijo zdaj zapišemo kot vsoto vseh treh členov
+\[
+E = E_{\text{vzmeti}} + C\,E_{\text{odboj}} + \lambda\,E_{\text{center}},
+\]
+kjer z nastavitvijo vrednosti konstante $\lambda$ določimo vpliv centrirnega člena. V kodi spremenimo le zadnji del metode \texttt{loss}
+\vspace*{3mm}
+\begin{lstlisting}
+        # centering loss
+        cent = Value(0.0)
+        for i in self.items:
+            x, y = self.pos[i]
+            cent += x * x + y * y
+
+        cent = self.cent_strength * cent / N
+
+        return spring + rep + cent
+\end{lstlisting}
+in k inicializaciji razreda dodamo nastavitev \texttt{self.cent\_strength}. V naši implementaciji smo njeno vrednost nastavili na $0.001$ in pri tako določenem problemu prav velikega vpliva ni imela.
+
+\section{Povezava t-SNE z vložitvami s silami}
+
+Tehniko t-SNE smo predstavili kot pristop, ki minimizira Kullback-Leiblerjevo divergenco med porazdelitvama podobnosti v izvornem prostoru in prostoru vložitve:
+\[
+\mathcal{L}(Y) = \sum_{i \ne j} p_{ij} \log \frac{p_{ij}}{q_{ij}},
+\]
+kjer velja
+\[
+q_{ij} = \frac{(1 + \|y_i - y_j\|^2)^{-1}}{\sum_{k \ne l} (1 + \|y_k - y_l\|^2)^{-1}}.
+\]
+Za razumevanje dinamike optimizacije izračunamo gradient kriterijske funkcije glede na položaje točk \( y_i \). Po odvajanju (tu predstavljamo samo rezultat) dobimo
+\[
+\frac{\partial \mathcal{L}}{\partial y_i}
+=
+4 \sum_{j \ne i}
+(p_{ij} - q_{ij})
+\frac{(y_i - y_j)}{1 + \|y_i - y_j\|^2}.
+\]
+Ta izraz lahko interpretiramo kot vsoto sil, ki delujejo na točko \( y_i \). Gradient lahko razcepimo na dva člena:
+\[
+\frac{\partial \mathcal{L}}{\partial y_i}
+=
+4 \sum_{j \ne i}
+p_{ij} \frac{(y_i - y_j)}{1 + \|y_i - y_j\|^2}
+-
+4 \sum_{j \ne i}
+q_{ij} \frac{(y_i - y_j)}{1 + \|y_i - y_j\|^2}.
+\]
+Prvi člen lahko v interpretaciji predstavlja privlačne sile med točkama \( i \) in \( j \), katerih jakost je sorazmerna podobnosti \( p_{ij} \) v izvornem prostoru. Te sile so največje za pare, ki so si v izvornem prostoru blizu, in vlečejo ustrezne točke v vložitvi skupaj. Drugi člen predstavlja odbojne sile, ki delujejo med vsemi pari točk in preprečujejo njihovo zgoščanje. Njihova jakost izhaja iz porazdelitve \( q_{ij} \), ki je odvisna od trenutne razporeditve točk v vložitvi.
+
+Gradient t-SNE lahko interpretiramo kot ravnovesje med privlačnimi in odbojnimi silami. V tem smislu je t-SNE soroden vložitvam s silami, le da so interakcije določene posredno prek verjetnostnega modela. Razlika je v tem, da so pri pristopu s silami te interakcije podane neposredno z vzmetnimi in odbojnimi členi, medtem ko pri t-SNE izhajajo iz verjetnostnega modela. \marginnote{Pristop t-SNE lahko zato razumemo kot verjetnostno utemeljeno vložitev s silami, kjer ravnovesje med privlačnimi in odbojnimi silami določa končno razporeditev točk v prostoru.}
+Privlačne sile pri t-SNE izrecno poudarjajo lokalne sosede preko uteži \( p_{ij} \), medtem ko oblika odbojnega člena z imenovalcem \( 1 + \|y_i - y_j\|^2 \) zagotavlja dolg doseg odboja in s tem preprečuje zgoščanje točk.
+
+\section{O implementacijah vložitvenih metod}
+
+Implementacije v tem poglavju so namenoma poenostavljene. Njihov namen ni numerična učinkovitost, temveč jasen prikaz povezave med kriterijsko funkcijo, gradientom in končno vložitvijo. Pri tem nismo ponudili numerično najučinkovitejših rešitev. To še posebej velja za metodo t-SNE, kjer smo uporabili precej poenostavljeno različico: širino Gaussove porazdelitve smo določili z enim samim parametrom $\sigma$, enakim za vse točke, medtem ko se v praksi $\sigma_i$ prilagaja za vsak primer posebej tako, 
+%
+\marginnote{Parametru, ki določa število sosedov pri t-SNE-ju, v angleščini pravimo {\em perplexity}.}
+da imajo vsi primeri v originalnem prostoru ``enako'' število sosedov. Poleg tega sodobne implementacije vključujejo številne izboljšave, kot so pametnejša inicializacija ter približni izračuni sil (npr. z Barnes--Hutovo aproksimacijo, kjer oddaljene točke nadomestimo z eno samo, povprečno), ki bistveno pohitrijo izvajanje pri večjih množicah podatkov. Dodaten trik je tudi zgodnje pretiravanje (angl.~\emph{early exaggeration}), kjer v začetnih iteracijah umetno povečamo vrednosti $p_{ij}$, s čimer okrepimo privlačne sile med bližnjimi točkami. Tako se skupine najprej jasno oblikujejo in ločijo, šele nato pa se njihova medsebojna razmerja natančneje uravnajo.
+
+Podobno velja tudi za večrazsežno lestvičenje. Čeprav lahko kriterijsko funkcijo minimiziramo z gradientnim sestopom, se v praksi najpogosteje uporablja algoritem SMACOF (angl.~\emph{Scaling by MAjorizing a COmplicated Function}). Ta pristop temelji na ideji majorizacije: namesto da neposredno optimiziramo zahtevno kriterijsko funkcijo, v vsakem koraku zgradimo njeno enostavnejšo zgornjo aproksimacijo, ki jo lahko minimiziramo v zaprti obliki. Tako dobimo iterativen postopek, ki monotonno zmanjšuje vrednost kriterijske funkcije in je praviloma stabilnejši ter hitrejši od preprostega gradientnega sestopa.
+
+Še najbliže praktični rabi je zato morda pristop z vložitvami s silami, kjer že osnovni modeli z vzmetmi in odbojem pogosto dajo uporabne rezultate. A tudi tam v praksi srečamo dodatne izboljšave, kot so uteževanje povezav, prilagajanje jakosti sil skozi čas (t.~i.\ ``ohlajanje'') in hitrejši približni izračuni odbojnih interakcij. Za praktično uporabo je pomembno predvsem to, da posamezni pristopi izhajajo iz različnih ciljev: MDS skuša ohraniti razdalje, t-SNE lokalne soseščine, metode s silami pa ravnovesje med privlačnimi in odbojnimi interakcijami.
+

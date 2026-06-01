@@ -116,6 +116,10 @@ Value(L: -8.0)
 
 Dela!
 
+\begin{exercise}{Operacija \texttt{tanh}.}
+V razred \texttt{Value} dodaj metodo \texttt{tanh}, ki na enak način kot \texttt{\_\_add\_\_} in \texttt{\_\_mul\_\_} ustvari novo vozlišče z vrednostjo $\tanh(\texttt{self.data})$, si zapomni predhodnika in oznako operacije. Nato zgradi graf za izraz \texttt{(a + b).tanh() * c} z vrednostmi $a=1.0$, $b=0.5$, $c=2.0$, izpiši končno vrednost in preveri, da ima izhodno vozlišče pravilne predhodnike v \texttt{\_prev}.
+\end{exercise}
+
 \section{Izris računskega grafa}
 
 \marginnote{Graphviz sta razvila Stephen North in Ellie Gansner v AT\&T Labs -- Research v začetku devetdesetih let (1991). Projekt je nastal kot del raziskav na področju vizualizacije grafov in avtomatskega risanja diagramov ter je bil kasneje objavljen kot odprtokodni projekt.}
@@ -296,6 +300,10 @@ Juhu! Dela. Oziroma, bolje rečeno, pravilno izračuna vrednosti gradientov za n
 \includegraphics[width=\linewidth]{figs/020-računski-graf-odvodi.pdf}
 \end{figure*}
 
+\begin{exercise}{Vzvratni prehod za \texttt{tanh}.}
+Razširi metodo \texttt{tanh} v razredu \texttt{Value} z implementacijo \texttt{\_backward()} (odvod $\tanh(x)$ je $1-\tanh^2(x)$). Zgradi graf za izraz \texttt{(a + b).tanh() * c} z vrednostmi $a=1.0$, $b=0.5$, $c=2.0$, po \texttt{backward()} izpiši gradiente po \texttt{a}, \texttt{b} in \texttt{c}. Nato z metodo končnih diferenc numerično oceni iste parcialne odvode in primerjaj rezultate; če se razlikujejo, poišči napako v forward ali backward delu.
+\end{exercise}
+
 \section{Konstante, negacija, potenciranje}
 
 Pri malce bolj kompleksnih funkcijah bi želeli v naših računskih grafih obravnavati tudi konstate, računali razlike, potence... Oziroma, delali z izrazi, kot so na primer spodnji:
@@ -382,5 +390,13 @@ for _ in range(50):
     a.data -= 0.1 * a.grad
     print(L.data, a.data)
 \end{lstlisting}
+
+\begin{exercise}{Gradientni sestop v dveh spremenljivkah.}
+Poišči minimum funkcije
+\[
+f(a,b)=a^2+b^2+ab-6a-4b
+\]
+z gradientnim sestopom. Parametra $a$ in $b$ predstavi z vozlišči \texttt{Value}, začni z $a=0$, $b=0$, naredi 50 korakov s hitrostjo učenja $0.1$ (v vsakem koraku zgradi graf, pokliči \texttt{f.backward()}, posodobi \texttt{a.data} in \texttt{b.data}). Izpiši končne vrednosti $a$, $b$ in $f(a,b)$. Analitično reši $\partial f/\partial a=0$ in $\partial f/\partial b=0$ ter preveri, ali se rezultat gradientnega sestopa ujema. Na koncu numerično oceni parcialna odvoda v končni točki z metodo končnih diferenc in primerjaj z \texttt{a.grad} in \texttt{b.grad}.
+\end{exercise}
 
 Tu je čas za bralca, da preskusi delovanje naše kode, jo morda preoblikuje v knjižnico in doda izračun in odvajanje za še kakšne dodatne funkcije. Mi pa se bomo spustili v nove podvige v naslednjem poglavju, ko bomo to kodo za avtomatsko odvajanje uporabili na bolj resnih primerih, kjer bodo (kriterijske) funkcije uporabljale tudi zunanje podatke in na primer tako implementirale iskanje modela za linearno regresijo ali njeno regularizirano inačico. Z zgornjimi, in morda še kakšnimi drugi manjšimi razširitvami, smo sedaj torej pripravljeni za ``resno'' uporabo naše male knjižnice za avtomatsko odvajanje.

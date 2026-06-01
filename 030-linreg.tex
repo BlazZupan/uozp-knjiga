@@ -2,6 +2,7 @@
 
 To poglavje pravzaprav ni čisto o linearni regresiji.\marginnote{Linearna regresija izvira iz metode najmanjših kvadratov, ki jo je leta 1805 prvi objavil Adrien-Marie Legendre, leta 1809 pa jo je Carl Friedrich Gauss pri analizi astronomskih opazovanj dodatno povezal z normalno porazdelitvijo. Izraz {\em regresija} je pozneje, v 1880-ih, uvedel Francis Galton pri preučevanju dednosti. Opazil je, da imajo zelo visoki starši sicer pogosto visoke otroke, vendar so ti v povprečju nekoliko bližje populacijskemu povprečju; ta pojav je poimenoval {\em regresija proti sredini} (angl. {\em regression toward the mean}).} Je bolj o tem, kako uporabimo strojno odvajanje za gradnjo modelov iz podatkov. A bomo sproti razmišljali tudi o linearni regresiji, verjetju in kriterijskih funkcijah. Začnemo z univariatno linearno regresijo, jo razširimo na multivariatno, vse skupaj poskusimo še na bolj resnih podatkih in razmislimo, ali na odkriti modeli lahko kako pomagajo pri razlagi podatkov.
 
+\vspace*{5mm}
 \section{Podatki in kaj sploh želimo}
 
 Pri \emph{univariatni regresiji} obravnavamo podatke, ki vsebujejo eno neodvisno spremenljivko $x$ in eno odvisno spremenljivko $y$. Cilj je opisati oziroma aproksimirati funkcijsko povezavo med njima z modelom linearne oblike
@@ -176,6 +177,18 @@ V vsaki iteraciji smo zgradili računski graf za našo izgubo, gradiente paramet
 %
 Gradientni sestop je v nekaj sto iteracijah torej našel (skoraj) pravi model, torej ta s parametri \( w=2 \) in \( b=-1 \). Bralcu tu prepuščamo eksperimente s spremenjeno stopnjo učenja. Povejmo le, da za te podatke in ta model učenje lahko konvergira hitreje, lahko pa z večanjem stopnje učenja pridemo do napake tipa \texttt{`OverflowError: (34, 'Result too large')}. Zakaj?
 
+\begin{exercise}{Stopnja učenja in konvergenca.}
+Uporabi iste podatke kot v poglavju (\texttt{random.seed(42)}, \texttt{n=5}, \texttt{ys = [2*x - 1 + ...]}). Za vsako stopnjo učenja iz množice $\{0.001,\ 0.01,\ 0.1,\ 1.0,\ 10.0\}$ zaženi \texttt{train(LinReg(), xs, ys, learning\_rate=..., n\_epochs=200)} in zabeleži končne vrednosti $w$, $b$ ter morebitno napako. Določi največjo stopnjo učenja, pri kateri učenje še konvergira blizu $w \approx 2$ in $b \approx -1$, ter najmanjšo, pri kateri pride do prekoračitve ali očitne divergenc. Na kratko razloži, zakaj prevelik korak gradientnega sestopa pri tej izgubi destabilizira učenje.
+\end{exercise}
+
+\begin{exercise}{Pot gradientnega sestopa.}
+Uporabi iste podatke kot v poglavju. Prilagodi funkcijo \texttt{train} tako, da po vsaki epohi zabeleži par $(w, b)$. Za isti začetni model zaženi učenje s \texttt{n\_epochs=100} pri stopnjah učenja $0.001$ in $0.1$, nato v ravnini $(w, b)$ izriši obe poti (točke poveži v zaporedju). Opiši, zakaj majhna stopnja učenja vodi do gladke poti proti minimumu, prevelika pa do cik-cak gibanja čez dolino izgube.
+\end{exercise}
+
+\begin{exercise}{Kritična stopnja učenja.}
+Za neke podatke primerne za linearno regresijo, na primer podobnim tem v poglavju, začni pri konvergentni stopnji učenja (npr.\ \texttt{0.001}) in jo iterativno podvajaj, dokler učenje z \texttt{n\_epochs=200} ne divergira (dobiš numerično napako, izguba se znatno poveča). Nato z binarnim iskanjem zoži interval med zadnjo stabilno in prvo nestabilno vrednostjo ter oceni največjo stabilno stopnjo učenja.
+\end{exercise}
+
 \section{Paketno učenje}
 
 Bralec teh zapiskov bi lahko pripomnil, da je primer v prejšnjem poglavju s samo petimi primeri bil preenostaven in da bi znali tako linearno regresijo narediti tudi "na roko". Morda, čeprav bi bilo računov že za tak majhen primer izjemno veliko. Zato pa je zdaj pravi trenutek, da preskusimo našo implementacijo na večji množici podatkov:
@@ -229,6 +242,26 @@ Pri paketnem učenju izguba na celotni učni množici ne bo padala monotono:
 \end{lstlisting}
 %
 Tudi naš model ni ravno najbolj idealen\marginnote{Kar naenkrat smo pridelali vrsto meta parametrov pri našem učenju. To so parametri, ki vplivajo na postopek učenja, vključujejo pa stopnjo učenja, število epoh, velikost paketa. Bralcu tu prepustimo razmislek, kako te parametre nastavimo, se bomo pa z njimi ukvarjali še v naslednjih poglavjih.}, so se pa parametri modela precej približali tem, s katerimi smo podatke generirali. Paketno učenje je sicer veliko hitrejše kot gradientni spust, kjer vsakič računamo izgubo na celotni učni množici, moramo pa biti pazljivi pri nastavitvah stopnje učenja in velikosti paketov podatkov.
+
+\begin{exercise}{Velikost paketa in konvergenca.}
+    Uporabi podatke iz tega poglavja
+    (\texttt{random.seed(42)}, \texttt{n=1000},
+    \texttt{ys = [2*x + 1 + random.gauss(0,5) for x in xs]}).
+    Za vsako velikost paketa iz množice
+    $\{1,\ 5,\ 10,\ 50,\ 100,\ 1000\}$
+    zaženi učenje z
+    \texttt{learning\_rate=0.01}
+    in \texttt{n\_epochs=500}.
+    Zabeleži končne vrednosti parametrov modela ter izgubo na celotni učni množici.
+    Primerjaj tudi potek izgube med učenjem.
+    Katera velikost paketa povzroči najbolj nestanovitno učenje?
+    Katera konvergira najhitreje?
+    Zakaj majhni paketi vodijo do bolj šumnih ocen gradienta.
+\end{exercise}
+
+\begin{exercise}{Pot paketnega učenja.}
+Uporabi podatke za univariatno regresijo. Prilagodi funkcijo \texttt{train} za paketno učenje (\texttt{batch\_loss}, \texttt{batch\_size=10}) tako, da po vsaki epohi zabeleži par $(w, b)$. Za isti začetni model zaženi učenje s \texttt{n\_epochs=200} pri stopnjah učenja $0.001$ in $0.1$, nato v ravnini $(w, b)$ izriši obe poti. Kaj opaziš?
+\end{exercise}
 
 \section{Multivariatna linearna regresija}
 
@@ -366,6 +399,10 @@ To pa je natanko vsota kvadratov napak, ki smo jo uporabili kot kriterijsko funk
 
 Izkaže se torej, da minimizacija kvadratne napake ni le intuitivna izbira, temveč sledi neposredno iz predpostavke, da so merske napake v podatkih normalno porazdeljene. V tem okviru parametre linearnega modela ocenimo z metodo največjega verjetja.
 
+\begin{exercise}{Vpliv šuma na oceno uteži.}
+Ustvari več podatkovnih množic po postopku iz poglavja (\texttt{random.seed(42)}, \texttt{n=1000}, enak \texttt{X}, različne vrednosti standardnega odklona šuma pri generiranju odvisne spremenljivke $y$, npr.\ $\{0,\ 1,\ 5,\ 20\}$). Za vsako množico nauči model \texttt{LinReg(n\_inputs=3)} in primerjaj ocenjene uteži ter prosti člen s pravimi vrednostmi ($w_0=2$, $w_1=3$, $w_2=-1$, $b=1$). Kako natančno model pri različnih ravneh šuma oceni prave vrednosti uteži?
+\end{exercise}
+
 \section{Razlaga}
 
 Parametri modelov linearne regresije so pravzaprav uteži atributov, linearna regresija pa utežena vsota parametrov. Uteži so povezane z vlogo posameznega atributa, oziroma njegovega vpliva na izhodno vrednost linearne funkcije. Manjše uteži bodo pripadale manj pomembnim atributom, večje pa bolj pomembnim.\marginnote{Želeli bi tudi na primer določiti najmanjšo množico atributov, ki nam gradijo dober model, in ostale atribute zanemariti. A bo to predmet naslednjega poglavja.} Pomembno vlogo bo imel seveda tudi predznak uteži, ki nam pove, ali je atribut negativno ali pozitivno povezan z izhodom. Tu je prostora še za dodatno razmišljanje o razlagi, morda tudi o kakšni njeni zanimivi vizualizaciji, a lotimo se tega počasi in tu razmišljajmo samo o utežeh.
@@ -455,4 +492,8 @@ Rezultat,
 \end{lstlisting}
 %
 je pravzaprav skladen s pričakovanji: za oceno deleža telesnih maščob je najbolje poznati obseg trebuha.\marginnote{Bralcu tu prepuščamo poskus, kaj bi se zgodilo, če podatkov ne bi normalizirali. Samo namig: rezultati bi bili močno različni.} Sledijo teža, obseg bokov in obseg zapestja, ki pa imajo negativne uteži. Negativen predznak ne pomeni nujno, da večja teža ali večji boki zmanjšujejo telesno maščobo; pomeni le, da ob upoštevanju vseh drugih atributov model te spremenljivke uporablja kot korekcijo napovedi. Takšne situacije so pogoste, kadar so atributi med seboj močno povezan.
+
+\begin{exercise}{Pomembni in nepomembni atributi.}
+Ustvari podatke po postopku iz multivariatnega primera (\texttt{random.seed(42)}, \texttt{n=1000}, $y$ odvisen le od prvih treh atributov). Podatkom dodaj pet naključnih atributov, ki niso povezanih z $y$. Nauči model \texttt{LinReg(n\_inputs=8)} in atribute razvrsti glede na absolutno vrednost ocenjenih uteži. Preveri, ali so med tremi najvišje uvrščenimi res prvi trije atributi. Kaj opaziš pri preostalih?
+\end{exercise}
  

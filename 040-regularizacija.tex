@@ -3,6 +3,7 @@
 V prejšnjem poglavju smo uporabili računske grafe in gradientni sestop za implementacijo linearne regresije in zaključili pri razlagi. To je, skušali smo interpretirati model s stališča uteži, ki jih je ta dodeli posameznim atributom. Na primeru podatkov s področja zdravstva smo na primer ugotovili, da ima pričakovano najpomembnejši atribut dejansko najvišjo utež, a da hkrati model tudi kombinira vrsto drugih atributov tako, da ustrezno popravi model. Pri tem so nas vsekakor ``zmotile'' tudi visoke korelacije med atributi in pa morda to, da so pri utežeh upoštevani prav vsi atributi iz učne množice. To je, prav vsi atributi so imeli neničelne uteži oziroma smo za uporabo modela morali upoštevati vse atribute. Fino bi recimo bilo, če bi model vseboval samo nekatere atribute in bi ostali imeli utež nič ter bili na ta način izločeni iz modela. Tak model bi bil enostavnejši za uporabo (vanj bi ob uporabi lahko vnesli manj podatkov), morda razumljivši, vsekakor pa bi tudi informacija o tem, katerih atributov ne upošteva, bila lahko koristna.
 
 \begin{margintable}
+\centering
 \begin{tabular}{S S}
 \toprule
 {$x$} & {$y$} \\
@@ -26,6 +27,7 @@ V prejšnjem poglavju smo uporabili računske grafe in gradientni sestop za impl
 
 Zgornjo idejo izločitve določenih vhodnih spremenljivk iz modela lahko implementiramo s pomočjo postopka, ki se imenuje {\em regularizacija}. A preden jo vpeljemo, začnimo s primerom, kjer lahko dodatni atributi močno škodijo učenju.
 
+\vspace*{5mm}
 \section{Polinomska regresija}
 
 Začnemo s podatki v tabeli~\ref{t:poly}. Ti podatki niso prav nič posebnega, razen po navidezni neprimernosti za linearno regresijo, kar kaže tudi spodnja slika.
@@ -35,28 +37,30 @@ Začnemo s podatki v tabeli~\ref{t:poly}. Ti podatki niso prav nič posebnega, r
 \caption{Linearna regresija naših začetnih podatkov iz tabele~\ref{t:poly} ne modelira najbolje.}
 \end{figure}
 
-Rekli bi lahko, da se te podatke ne da modelirati z linearno regresijo. Ali pač? V tabelo dodajmo nov, izvedeni atribut $x^2$ in naj bo tako dopolnjena tabela vhod za linearno regresijo. Ta bo poiskala uteži atributov za model
 %
 \begin{margintable}
-\begin{tabular}{S S S}
-\toprule
-{x} & {$x^2$} & {y} \\
-\midrule
-0.19 & 0.04 & 0.28 \\
-0.09 & 0.01 & 0.24 \\
-0.16 & 0.03 & 0.48 \\
-0.34 & 0.12 & 0.60 \\
-0.59 & 0.35 & 0.71 \\
-0.87 & 0.76 & 0.51 \\
-0.89 & 0.79 & 0.37 \\
-0.68 & 0.46 & 0.62 \\
-0.36 & 0.13 & 0.51 \\
-0.82 & 0.67 & 0.48 \\
-\bottomrule
-\end{tabular}
-\vspace*{3mm}
-\caption{Prejšnji tabeli podatkov (tabela~\ref{t:poly}) smo dodali novo kolono oziroma nov atribut, ki smo ga izračunali iz kolone $x$.}
-\end{margintable}
+    \begin{tabular}{S S S}
+    \toprule
+    {x} & {$x^2$} & {y} \\
+    \midrule
+    0.19 & 0.04 & 0.28 \\
+    0.09 & 0.01 & 0.24 \\
+    0.16 & 0.03 & 0.48 \\
+    0.34 & 0.12 & 0.60 \\
+    0.59 & 0.35 & 0.71 \\
+    0.87 & 0.76 & 0.51 \\
+    0.89 & 0.79 & 0.37 \\
+    0.68 & 0.46 & 0.62 \\
+    0.36 & 0.13 & 0.51 \\
+    0.82 & 0.67 & 0.48 \\
+    \bottomrule
+    \end{tabular}
+    \vspace*{3mm}
+    \caption{Prejšnji tabeli podatkov (tabela~\ref{t:poly}) smo dodali novo kolono oziroma nov atribut, ki smo ga izračunali iz kolone $x$.}
+    \end{margintable}
+%
+Rekli bi lahko, da se te podatke ne da modelirati z linearno regresijo. Ali pač? V tabelo dodajmo nov, izvedeni atribut $x^2$ in naj bo tako dopolnjena tabela vhod za linearno regresijo. Ta bo poiskala uteži atributov za model
+
 
 \[
 y = w_0 + w_1 x + w_2 x^2 .
@@ -169,7 +173,20 @@ R^2 = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}
 {\sum_{i=1}^{n}(y_i - \bar{y})^2}.
 \]
 
-Mera $R^2$ je pogosto bolj primerna od mer, kot je RMSE, ker je brezrazsežna in vedno v enakem razponu, torej med 0 in 1\marginpar{Pa je to res? Je možno, da bi kakšen model napovedoval slabše od najenostavnejšega modela? Bo to tako na učni množici primerov ali na novih primerih?}, ter zato omogoča primerjavo točnosti med različnimi podatkovnimi množicami ali problemi. Medtem ko RMSE podaja napako v enotah ciljne spremenljivke, $R^2$ izraža, kolikšen delež variance podatkov pojasni model, kar je pogosto bolj intuitivno. Poleg tega $R^2$ neposredno primerja model z osnovnim pristopom napovedovanja s povprečjem, zato takoj pove, ali model dejansko prinaša izboljšavo.
+Mera $R^2$ je pogosto bolj primerna od mer, kot je RMSE, ker je brezrazsežna in vedno v enakem razponu, torej med 0 in 1,
+%
+\marginnote{Pa je to res? Je možno, da bi kakšen model napovedoval slabše od najenostavnejšega modela? Bo to tako na učni množici primerov ali na novih primerih?}
+%
+ter zato omogoča primerjavo točnosti med različnimi podatkovnimi množicami ali problemi. Medtem ko RMSE podaja napako v enotah ciljne spremenljivke, $R^2$ izraža, kolikšen delež variance podatkov pojasni model, kar je pogosto bolj intuitivno. Poleg tega $R^2$ neposredno primerja model z osnovnim pristopom napovedovanja s povprečjem, zato takoj pove, ali model dejansko prinaša izboljšavo.
+
+\begin{exercise}{Negativen $R^2$ na testni množici.}
+Pripravi majhno univariatno učno množico, jo razdeli na učno (npr. 70\%) in testno, in neposredno iz učne množice zgradi model direktno ali pa s polinomsko razširitvijo različnih stopenj. Napovedi ovrednoti na testnih podatkih z lastno implementacijo $R^2$. Poišči primer delitve podatkov ali stopnje polinoma, pri katerem je testni $R^2$ negativen. Zakaj model v tem primeru napoveduje slabše od konstantnega modela, ki bi vrnil povprečje učnih ciljnih vrednosti?
+\end{exercise}
+
+\begin{exercise}{Negativen $R^2$ pri napovedih s srednjo vrednostjo.}
+    Podobno kot zgoraj, le da napoveduješ s srednjo vrednostjo odvisne spremenljivke učne množice. Pričakovana vrednost $R^2$ na testni množici je 0. Kaj v resnici dobiš? Preveri, kako je to odvisno od velikosti učnih množic.
+\end{exercise}
+    
 
 \section{Regularizacija L1}
 
@@ -250,6 +267,16 @@ Pri L1 regularizaciji pa omejitev postane
 \]
 
 kar v ravnini $(w_1,w_2)$ tvori romb. Ker ima romb ostre vogale na koordinatnih oseh, se elipse pogosto dotaknejo prav v enem od teh vogalov. V takšni točki pa je ena od uteži natanko enaka nič.
+
+\begin{exercise}{Regularizacijska pot in nestabilnost izbora značilk.}
+Ustvari sintetično regresijsko množico podatkov z nekaj resnično informativnimi značilkami, več nepomembnimi in skupino močno koreliranih kopij ene pomembne značilke. \emph{Regularizacijska pot} je zaporedje ocen uteži pri naraščajočih vrednostih $\lambda$; za vsako $\lambda$ nauči model z regularizacijo L1 ali L2 ter izriši odvisnosti vrednosti uteži za posamezne atribute v odvisnosti od stopnje regularizacije. Pri L1 spremljaj, katere uteži postanejo ničelne in kdaj. Poskus ponovi z vsaj tremi različnimi podatkovnimi množicami.
+\end{exercise}
+
+\begin{exercise}{Korelirane značilke.}
+Ustvari sintetično regresijsko množico podatkov, pri kateri je ciljna spremenljivka odvisna od treh atributov. V podatke dodaj več atributov, ki so močno korelirani s posameznim izbranim atributom iz originalne množice. Nauči model z L1 regularizacijo pri izbrani stopnji regularizacije $\lambda$. Učenje ponovi večkrat zapored (npr. z različnimi naključnimi začetnimi utežmi). Preveri, ali Lasso med koreliranimi značilkami vedno izbere isto. Kaj ti ugotovitve povejo o razlagi modela z ničelnimi utežmi?
+\end{exercise}
+
+
 
 \section{Regularizacija in točnost na učni in testni množici}
 
@@ -358,5 +385,7 @@ model = fit(train, best_reg)
 
 Kar komplicirano je že zdaj. Je pa tu še en problem. Zgornje je namreč primerno za res velike podatke, pri manjših pa bo sama razdelitev na podmnožice lahko zelo vplivala na oceno točnosti. Pri slednji bi si lahko pomagali s prečnim preverjanjem, in podali oceno tako, da bi bila ta povprečje več eksperimentov. Bi znali zgornje spremeniti na ustrezen način in vključiti prečno preverjanje?
 
-
+\begin{exercise}{Uhajanje informacij pri standardizaciji in izboru $\lambda$.}
+Uporabi podatke o stopnji telesne maščobe iz poglavja, a jih omeji na majhno množico (npr.\ prvih 50 primerov). Iz nje loči majhno učno množico (npr.\ 10 primerov); testna množica so vsi preostali primeri (npr.\ 40). Primerjaj dva postopka: (1) nepravilnega, kjer standardiziraš vseh 50 primerov pred delitvijo, izbereš $\lambda$ z najvišjim $R^2$ na testni množici in to vrednost poročaš kot oceno uspešnosti; (2) pravilnega, kjer najprej ločiš učno in testno množico, iz učnih primerov ločiš še validacijsko množico (npr.\ 3), standardiziraš le z učnih podatkov, $\lambda$ izbereš na validacijski množici in točnost enkrat oceniš na testni množici. Primerjaj testne ocene $R^2$ in razloži, zakaj mora biti tudi izbira regularizacije biti izvedena na učni množici.
+\end{exercise}
 

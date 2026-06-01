@@ -181,7 +181,7 @@ Je tako enostavna metoda sploh uporabna? Je. Kdo pravi, da jo moramo uporabiti s
 \small
 \begin{tabular}{lccccc}
 \toprule
-\textbf{Car} & \textbf{Type} & \textbf{kWh/100 km} & \textbf{HP} & \textbf{0--100 km/h (s)} & \textbf{Trunk (L)} \\
+\textbf{Car} & \textbf{Type} & \makecell{\textbf{kWh/}\\\textbf{100 km}} & \textbf{HP} & \makecell{\textbf{0--100 km/h}\\\textbf{(s)}} & \makecell{\textbf{Trunk}\\\textbf{(L)}} \\
 \midrule
 Toyota Yaris Hybrid        & 0  & 18 & 116 & 9.7 & 286 \\
 Nissan Qashqai e-POWER     & 0  & 21 & 190 & 7.9 & 504 \\
@@ -414,13 +414,29 @@ ter te uporabimo pri interpretaciji dobljene projekcije.
 
 Prvi dve glavni komponenti torej zajameta več kot 90\% celotne variance. Dvodimenzionalna projekcija podatkov zato dobro ohranja strukturo podatkov. Prva komponenta (PC1) v največji meri ločuje vozila glede na zmogljivost in tip pogona, kar se kaže v večjih absolutnih utežeh pri atributih \texttt{Type}, \texttt{Horsepower} in \texttt{kWh/100 km}. Druga komponenta (PC2) pa je izrazito povezana z velikostjo vozila (predvsem \texttt{Trunk Size}), zato v vertikalni smeri razporeja avtomobile glede na prostornost. Na sliki~\ref{fig:cars-2d} tako jasno opazimo skupine vozil: manjši, varčnejši modeli se pojavljajo v zgornjem delu prostora, večji in zmogljivejši (pogosto priključni hibridi) pa v drugem, spodnjem, kar potrjuje, da PCA uspešno razkrije glavne vzorce v podatkih.
 
+\begin{exercise}{Kdaj glavna komponenta sledi šumu?}
+Sestavi podatke z dvema skupinama točk: na začetku naj bosta dobro ločeni v vodoravni smeri, nato postopoma povečuj navpični šum. Za vsako stopnjo šuma izračunaj prvo glavno komponento in jo primerjaj z intuitivno smerjo ločevanja skupin. Opazuj, pri kateri stopnji šuma prva komponenta preneha slediti ločevanju in začne slediti šumu. Poskusi ustvariti primer, kjer PCA popolnoma zgreši intuitivno ``najpomembnejšo'' smer podatkov.
+\end{exercise}
+    
+\begin{exercise}{Zakaj PCA ne vidi kroga?}
+Generiraj točke na krožnici ali polkrogu. Izračunaj PCA in podatke projiciraj na prvo komponento. Rezultat vizualiziraj ter razloži, zakaj PCA kljub očitni geometrijski strukturi ne najde uporabne enodimenzionalne predstavitve.
+\end{exercise}
+
 \section{Nekaj lastnosti v povezavi s korelacijami atributov}
 
 Ponovimo na kratko: v evklidskem prostoru se variance po ortogonalnih oseh seštevajo. Če so atributi standardizirani, je varianca po vsaki osi enaka \(1\), zato je skupna varianca podatkov enaka številu atributov, \(d\). Prva glavna komponenta bo zato pojasnila več kot \(1/d\) celotne variance le tedaj, ko v podatkih obstaja neka struktura, to je, ko podatki niso zgolj naključno razmetani po prostoru.
 
 To je intuitivno že v dveh dimenzijah. Pri podatkih s slike~\ref{fig:data} levo, kjer sta atributa nekorelirana in so podatki približno enakomerno razpršeni v vse smeri, lahko prvo komponento poljubno obračamo, pa bo vedno zajela približno polovico variance. Nobena smer namreč ni posebej izstopajoča. Za pojasnitev celotne variance zato nujno potrebujemo še drugo, pravokotno komponento. Podobno velja tudi v večrazsežnem prostoru: če so podatki približno sferično razporejeni, nobena komponenta ne bo izrazito pomembnejša od drugih.
 
+\begin{exercise}{Koliko variance pojasni prva komponenta pri naključnih podatkih?}
+Ustvari podatkovno množico z desetimi atributi, kjer so vse vrednosti vzorčene neodvisno iz standardne normalne porazdelitve. Atribute standardiziraj in izračunaj PCA. Izmeri delež variance, ki ga pojasni prva komponenta, ter ga primerjaj s teoretično vrednostjo $1/10$. Poskus ponovi za različne velikosti podatkovne množice (npr.\ 20, 50, 100, 500 in 5000 primerov) in za vsako velikost izvedi več ponovitev. Nariši graf povprečne pojasnjene variance prve komponente v odvisnosti od velikosti vzorca. Ali se pri večjih množicah pojasnjena varianca približuje pričakovani vrednosti? Kako se spreminja razlika med prvo in drugo komponento?
+\end{exercise}
+
 PCA je zato najbolj uporabna takrat, ko med atributi obstajajo korelacije oziroma, širše, kadar podatki ležijo blizu nekega manjrazsežnega podprostora, recimo neke podravnine. V takem primeru glavne komponente kažejo v smeri največje razpršenosti podatkov, torej v smeri, kjer podatki nosijo največ informacije v smislu variance. Delež razložene variance po posamezni komponenti bo toliko večji od \(1/d\), kolikor izrazitejša je ta struktura.
+
+\begin{exercise}{Ali PCA odkrije skupine povezanih atributov?}
+Sestavi podatkovno množico z devetimi atributi: naj prvi trije izhajajo iz iste skrite spremenljivke, drugi trije iz druge in zadnji trije iz tretje; vsakemu atributu dodaj manjšo količino naključnega šuma. Podatke standardiziraj in izračunaj PCA. Za prve tri glavne komponente izpiši uteži posameznih atributov ter jih prikaži z grafom. Preveri, ali imajo atributi iz iste skupine podobne uteži na isti komponenti. Nato povečaj količino šuma in opazuj, kako se spreminjata delež pojasnjene variance in interpretabilnost komponent.
+\end{exercise}
 
 Če želimo pojasniti prav vso varianco osnovnega prostora, moramo uporabiti vse glavne komponente. To pa navadno ni smiselno, saj s tem dimenzije sploh ne zmanjšamo. Namen PCA namreč ni modelirati prav vsega, tudi ne vsega šuma, ki je prisoten v podatkih. Pogosto nas zanima kompromis: obdržati le toliko komponent, da pojasnijo, denimo, \(80\%\) ali \(90\%\) celotne variance, preostanek pa zanemariti.
 
@@ -429,6 +445,8 @@ Pri tem velja nekaj previdnosti. Smeri z majhno varianco pogosto res ustrezajo �
 Pomembna lastnost PCA je tudi ta, da so glavne komponente med seboj ortogonalne, projekcije podatkov nanje pa nekorelirane. S tem dobimo nov koordinatni sistem, v katerem so informacije po posameznih oseh ločene oziroma nepodvojene.
 
 S tem pridemo do glavnih uporab PCA: (1) vizualizacija podatkov v eni ali dveh dimenzijah, (2) zmanjšanje dimenzionalnosti in pogosto tudi delno odstranjevanje šuma ter (3) prehod v nov, dekoreliran prostor atributov. Kakšna enostavna linearna tehnika za analizo podatkov in tako zelo široko uporabo! In sploh še nismo na koncu. :)
+
+
 
 \section{Regularizacija}
 
@@ -499,6 +517,10 @@ Zgoraj smo tudi v analizi glavnih komponent uvedli regularizacijo in s tem metap
 O ocenjevanju točnosti in izboru metaparametrov smo pisali že na koncu prejšnjega poglavja. Kvaliteto modela moramo vedno oceniti na ločeni, testni množici. Kvaliteta pri PCA ni vezana na napovedovanje, a smo tudi pri razvoju PCA določili kriterijsko funkcijo — stopnjo razložene variance — ki nam lahko služi za oceno, kako dober je naš model.
 
 Postopek je zato močno podoben, ali bolj rečeno, v osnovni enak kot pri linearni regresiji: podatke razdelimo na učno in testno množico. Na učni množici zgradimo model (določimo glavne komponente), nato pa testne podatke projiciramo na te komponente in na tej projekciji izračunamo razloženo varianco. S tem ocenimo, kako dobro naučene komponente zajamejo strukturo novih podatkov. Pri tem moramo biti pozorni, da vse korake, kot je standardizacija podatkov, izvedemo na učni množici in nato enake transformacije uporabimo na testni množici. V nasprotnem primeru bi lahko nehote uporabili informacijo iz testnih podatkov. Pri tem razloženo varianco na testni množici vedno računamo glede na standardizacijo, naučeno na učni množici, saj bi sicer v oceno nehote vključili informacijo iz testnih podatkov.
+
+\begin{exercise}{Pojasnjena varianca PCA na testni množici.}
+Na internetu poišči podatkovni nabor z vsaj petimi zveznimi atributi in vsaj 200 primeri (npr.\ Wine, Parkinsons, Auto MPG, Abalone ali podoben nabor iz UCI Machine Learning Repository). Podatke standardiziraj in jih večkrat naključno razdeli na učno in testno množico. PCA nauči le na učni množici, nato na testni izračunaj delež variance, ki ga pojasnijo prva, prvi dve in prve tri glavne komponente. Poskus ponovi za velikosti učne množice 10, 20, 50, 100 in 200 ter rezultate povpreči. Nariši odvisnost pojasnjene variance na testni množici od velikosti učne množice in razloži opažene razlike. Ali se pojasnjena varianca s povečevanjem učne množice približa tisti, ki jo dobiš, če PCA naučiš na vseh podatkih?
+\end{exercise}
 
 Za ocenjevanje primerne vrednosti stopnje regularizacije lahko uporabimo isti trik kot pri linearni regresiji: celotno metodo (standardizacijo, izbor stopnje regularizacije na validacijski množici in gradnjo končnega modela s tako ocenjeno stopnjo regularizacije) zapremo v škatlo, in to v namene neodvisne ocene uspešnosti validiramo na testni množici. Za bolj robustno validacijo lahko tudi tu uporabimo prečno preverjanje. In za končni model celotno škatlo z našo metodo poženemo na vseh podatkih.
 
@@ -573,3 +595,7 @@ Vse ostale komponente so torej lastni vektorji, urejeni po padajočih lastnih vr
 \end{enumerate}
 
 Zgornja izpeljava je elegantna in vzpostavi povezavo med glavnimi komponentami in prostorom lastnih vektorjev kovariančne matrike. Tu tudi postane jasno, zakaj so glavne komponente povezane s korelacijami med atributi. A kljub eleganci rešitve ta ne omogoča razširitev tehnike z regularizacijo, kjer je pristop, ki uporablja gradientni sestop, kot smo ga razvili v poglavju, prava rešitev.
+
+\begin{exercise}{Analitični PCA in gradientni sestop.}
+Po korakih iz zgornje izpeljave implementiraj analitično PCA: podatke standardiziraj, izračunaj kovariančno matriko ter poišči lastne vektorje in lastne vrednosti. Rezultate (smeri glavnih komponent, uteži atributov in delež pojasnjene variance) primerjaj z implementacijo prek gradientnega sestopa (\texttt{PCA1D} ali \texttt{PCA2D}) na izbranih podatkih iz poglavja ali na lastni sintetični ali neki iz omrežja pridobljeni množici. Ali se oba pristopa ujemata? Kje se morebiti razlikujeta? Primerjaj tudi hitrosti postopkov.
+\end{exercise}

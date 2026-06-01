@@ -2,15 +2,27 @@
 *.aux
 *.log
 *.toc
+*.out
 
 ## Ignore temporary book rendering
 main.pdf
 0*.pdf
+1*.pdf
 
-## Ignore code directory
+## Code directory
 code/
+
+## Student exercises
+exercises/
 
 ## Local helper files:
 copy-to-server
+corrections.yaml
 prompts.md
 split-to-chapters.py
+check-figures.py
+
+## Local temporary directories
+.cursor
+__marimo__/
+__pycache__/

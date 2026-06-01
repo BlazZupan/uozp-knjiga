@@ -9,6 +9,29 @@
 % \addbibresource{main.bib}
 \usepackage{xargs}
 % \renewcommandx{\cite}[3][1={0pt},2={}]{\sidenote[][#1]{\fullcite[#2]{#3}}}
+\usepackage[slovene]{babel}
+\usepackage{datetime}
+\newcommand{\monthyear}{%
+  \ifcase\month
+  \or januar%
+  \or februar%
+  \or marec%
+  \or april%
+  \or maj%
+  \or junij%
+  \or julij%
+  \or avgust%
+  \or september%
+  \or oktober%
+  \or november%
+  \or december%
+  \fi
+  \space\number\year
+}
+\newcommand{\runinheading}[1]{%
+  \vspace*{5mm}%
+  \noindent\textbf{#1}.%
+}
 
 \title{Uvod v odkrivanje znanj iz podatkov}
 \date{2026}
@@ -43,13 +66,6 @@
 % Prints a trailing space in a smart way.
 \usepackage{xspace}
 
-% Prints the month name (e.g., January) and the year (e.g., 2008)
-\newcommand{\monthyear}{%
-  \ifcase\month\or January\or February\or March\or April\or May\or June\or
-  July\or August\or September\or October\or November\or
-  December\fi\space\number\year
-}
-
 
 % Prints an epigraph and speaker in sans serif, all-caps type.
 \newcommand{\openepigraph}[2]{%
@@ -65,6 +81,41 @@
 
 % Inserts a blank page
 \newcommand{\blankpage}{\newpage\hbox{}\thispagestyle{empty}\newpage}
+
+% Excercise box
+\usepackage{mdframed}
+\usepackage{needspace}
+\usepackage{xcolor}
+\definecolor{exerciseblue}{RGB}{40,90,150}
+
+\newenvironment{exercise}[1]
+{
+\Needspace{8\baselineskip}
+\begin{mdframed}[
+  linewidth=1.1pt,
+  linecolor=exerciseblue,
+  topline=true,
+  leftline=true,
+  rightline=false,
+  bottomline=false,
+  userdefinedwidth=0.98\linewidth,
+  leftmargin=0pt,
+  rightmargin=0pt,
+  innerleftmargin=0.8em,
+  innerrightmargin=0.8em,
+  innertopmargin=0.6em,
+  innerbottommargin=0.4em,
+  skipabove=1em,
+  skipbelow=1em
+]
+\small
+\noindent\textsc{Poskusi sam: #1}\par
+\vspace{0.7em}
+\noindent\ignorespaces
+}
+{
+\end{mdframed}
+}
 
 % \usepackage{units}
 
@@ -164,6 +215,7 @@
 \usepackage{siunitx}
 
 \usepackage{listings}
+\usepackage{listingsutf8}
 \lstset{
     language=Python,
     basicstyle=\ttfamily\small,          % Code font style
@@ -174,14 +226,28 @@
     numbers=none,                        % No line numbers
     showstringspaces=false,              % Don't show spaces in strings
     backgroundcolor=\color{white},       % White background (default)
-}
-
-\lstset{
-  literate={∂}{{$\partial$}}1
+    inputencoding=utf8,
+    extendedchars=true,
+    literate=
+        {č}{{\v c}}1
+        {ć}{{\'c}}1
+        {đ}{{\dj}}1
+        {š}{{\v s}}1
+        {ž}{{\v z}}1
+        {Č}{{\v C}}1
+        {Ć}{{\'C}}1
+        {Đ}{{\DJ}}1
+        {Š}{{\v S}}1
+        {Ž}{{\v Z}}1
+        {∂}{{$\partial$}}1
 }
 
 \usepackage{multirow}
 \usepackage{array}
+\usepackage{tabularx}
+\usepackage{makecell}
+\usepackage{siunitx}
+\usepackage{hyperref}
 
 % Allow flexible page heights to avoid underfull vbox warnings
 \raggedbottom
@@ -209,7 +275,7 @@ Copyright \copyright\ \the\year\ \thanklessauthor
 
 \par\smallcaps{Študijsko gradivo, \thanklesspublisher}
 
-\par To delo je izdano pod licenco Priznanje avtorstva-Nekomercialno-Deljenje pod enakimi pogoji 4.0 Mednarodna (CC BY-NC-ND 4.0).
+\par To delo je izdano pod licenco Priznanje avtorstva-Nekomercialno-Deljenje pod enakimi pogoji 4.0 Mednarodna (CC BY-NC-ND 4.0). Delo je prosto dostopno na spletnih straneh predmeta Odkrivanje znanj iz podatkov, ki se izvaja na UL FRI.
 
 \par\textit{Delovno verzija, \monthyear}
 \end{fullwidth}
@@ -222,20 +288,26 @@ Copyright \copyright\ \the\year\ \thanklessauthor
 \cleardoublepage
 \chapter*{Uvod}
 
-Besedilo namesto uvodnika. 
+Pričujoči zapiski nastajajo v okviru predavanj pri predmetu Uvod v odkrivanje znanj iz podatkov. Predmet izvajamo že dolgo, morda že 20 let, in se je od svojega nastanka precej spreminjal. Njegovo čudno ime izvira iz poimenovanja področja podatkovnih znanosti na prelomu stoletja, ki je hotelo izpostaviti, da lahko iz industrijskih in znanstvenih baz podatkov odkrijemo novo znanje in ga s pridom uporabimo. Angleški izraz {\em knowledge discovery in databases} se je takrat uporabljal vzporedno z izrazom {\em data mining}, podatkovno rudarjenje, morda tudi zato, da bi nadomestil takrat manj popularen izraz strojno učenje. Predmet strojno učenje je bil na UL FRI sicer od nekdaj, in zaradi želje po predmetu, ki bi se osredotočil na razumevanje podatkov, ni bilo drugega, kot privzeti malce drugačno poimenovanje.
+
+Predmet se je po vsebini z leti zelo spremenil. Sprva je bil izvajan v prvem semestru tretjega letnika in je imel priložnost sistematičnega obravnavanja pristopov razložljivega strojnega učenja. Po prestavitvi v drugi semester pa je tu moral zavzeti popolnoma drugačno vlogo, saj so študenti pri predhodnih predmetih slišali, sicer mnogokrat precej na hitro, praktično o vseh pristopih, ki se danes uporabljajo v strojnem učenju. Predmet zato krmilimo v dve smeri: poglobljeno praktično razumevanje področja, od samih osnov naprej, in poudarek na tehnikah, ki osvetlijo podatke z razložljivimi modeli, ki jih lahko uporabniki pojasnijo in z njimi odkrijejo vzorce v podatkih ter morda na ta način razložijo procese, ki so podatke generirali.
+
+Velik vpliv na sestavo predmeta imajo izobraževalni videi Andreja Karpathya, predvsem njegov pristop, kjer sicer kompleksne koncepte razloži z razvojem programov, iz nule, v Pythonu. Ta pristop uporabljamo tudi pri predmetu, zato je v zapiskih veliko kode. Snov podajamo tudi z enačbami in razlagami, a sledimo temu, da je prav vse potem zapisano v programih. Znanje algoritmičnega razmišljanja in zapisa postopkov v kodi je osnova računalniškega inženirstva.
 
 \mainmatter
 
 %\part{Part Name}
-% \input{010-racunski-graf}
-% \input{020-strojno-odvajanje}
-% \input{030-linreg}
-% \input{040-regularizacija}
-% \input{050-pca}
-% \input{060-vlozitve}
-% \input{070-grucenje}
-% \input{080-viz}
-\input{090-glm}
+\input{010-racunski-graf}
+\input{020-strojno-odvajanje}
+\input{030-linreg}
+\input{040-regularizacija}
+\input{050-pca}
+\input{060-vlozitve}
+\input{070-grucenje}
+\input{080-nomogrami}
+\input{090-nn}
+\input{100-viz}
+\input{110-genai}
 
 \backmatter
 
