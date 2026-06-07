@@ -3,6 +3,10 @@
 *.log
 *.toc
 *.out
+*.gls
+*.gz
+*.fdb_latexmk
+*.fls
 
 ## Ignore temporary book rendering
 main.pdf
