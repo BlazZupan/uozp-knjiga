@@ -652,9 +652,9 @@ je particijska metoda gručenja, ki podatke razdeli v vnaprej določeno število
 
 Izhod metode je razbitje primerov na $K$ gruč in pripadajoči voditelji. Metoda optimizira kompaktnost gruč, to je vsoto kvadratov razdalj primerov do njihovih voditeljev (SSE):
 \[
-\sum_{i=1}^K \sum_{x \in C_i} \|x - v^{(i)}\|^2,
+\frac{1}{n}\sum_{i=1}^n \min_{k=1,\ldots,K}\|x_i-v_k\|^2 
 \]
-pri čemer so optimalni voditelji enaki centroidom gruč. Algoritem praviloma hitro konvergira, vendar le do lokalnega optimuma, zato je rezultat odvisen od začetne izbire voditeljev.
+pri čemer so optimalni voditelji tudi centroidi gruč. Algoritem praviloma hitro konvergira, vendar le do lokalnega optimuma, zato je rezultat odvisen od začetne izbire voditeljev.
 
 Prednost metode je njena učinkovitost in primernost za velike podatkovne množice, slabosti pa so potreba po vnaprejšnji določitvi $K$, občutljivost na inicializacijo in mera razdalje ter dejstvo, da metoda najbolje deluje za približno kroglaste in po velikosti primerljive gruče.
 
