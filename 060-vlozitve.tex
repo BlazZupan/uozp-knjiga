@@ -147,6 +147,10 @@ Malce je zasukana in narobe obrnjena, a kdo pravi, da mora biti sever na vrhu in
 
 Opozorilo sicer: MDS-vložitev z enako dobro vrednostjo kriterijske funkcije $J(Y)$ je nešteto. Pri nespremenjeni vrednosti kriterijske funkcije vložitve lahko poljubno rotiramo in zrcalimo. Vse te transformacije ohranjajo razdalje in pravzaprav samo te nastopajo v kriterijski funkciji. Dobljene osi zato nimajo pomena in jih kot takih ne moremo povezati s kakšno razlago. Drugače kot pri PCA torej. A spomnimo: pri PCA izhajamo iz atributno predstavljenih primerov, tu pa, pri MDS, iz razdalj.
 
+\begin{exercise}{Ista struktura, drugačen zemljevid.}
+Isto podatkovno množico večkrat vloži z različnimi naključnimi začetnimi položaji ter primerjaj končne vložitve, njihove vrednosti izgube in medsebojne razdalje, da ugotoviš, koliko je rezultat odvisen od inicializacije.
+\end{exercise}
+
 \begin{exercise}{Koliko razdalj potrebujemo za zemljevid?}
 Vzemi podatke o slovenskih mestih iz poglavja. Najprej uporabi vse podane razdalje in z MDS rekonstruiraj zemljevid. Nato naključno odstranjuj vedno več razdalj (npr.\ 10\%, 25\%, 50\%, 75\%) in opazuj, kako se spreminja kakovost vložitve. Kdaj postane problem premalo določen? Ali obstajajo razdalje, katerih odstranitev bistveno bolj škodi kot odstranitev drugih? Kakovost vložitve lahko opazuješ izkustveno, s karto, lahko pa uporabiš tudi isto metriko kot pri ocenjevanju izgube pri MDS, le da to oceno izračunaš iz celotne množice podatkov (torej ne samo iz te, iz katerih iz vzorčil učno množico).
 \end{exercise}
@@ -270,6 +274,10 @@ Tu uporabljamo poenostavljeno različico metode t-SNE. V standardni izvedbi se �
 Na podatkih z več jasno ločenimi skupinami izvedi t-SNE za različne vrednosti $\sigma$. Opazuj, kako se spreminja oblika vložitve. Pri majhnih vrednostih bo metoda poudarjala zelo lokalne sosede, pri velikih pa se bo približevala globalni strukturi. Poskusi najti vrednost, pri kateri so skupine najbolj jasno ločene.
 \end{exercise}
 
+\begin{exercise}{t-SNE z razredno informacijo.}
+Izberi podatkovno množico za klasifikacijo in kriterijski funkciji t-SNE dodaj člen, ki spodbuja, da so primeri istega razreda v vložitvi bližje skupaj, primeri različnih razredov pa bolj narazen; nato postopoma povečuj utež tega člena in opazuj, kako se spreminjata geometrija vložitve ter ločenost razredov.
+\end{exercise}
+
 Uporaba zgornje implementacije od tu dalje ni prav nič drugačna kot za MDS:
 \vspace*{3mm}
 \begin{lstlisting}
@@ -282,6 +290,10 @@ Tudi tu so na vhodu razdalje, na izhodu pa vložitve primerov. Te znova lahko pr
 \marginnote{Pri majhnih množicah, kot so mesta v tem poglavju, sta vložitvi MDS in t-SNE pogosto skoraj enaki, zato razlika med globalno in lokalno strukturo ostane abstraktna. Poskus na visokorazsežnih podatkih to ilustrira neposredno: ko skupine v izvornem prostoru približujemo, MDS zlije vložitev, t-SNE pa naj bi ohranjal ločene gruče.}
 \begin{exercise}{Kaj vidi posamezna metoda?}
 Na majhnih množicah sta MDS in t-SNE pogosto podobni; zato ustvari tri dobro ločene skupine točk v desetdimenzionalnem prostoru, izračunaj vse medsebojne razdalje in jih vloži z MDS ter t-SNE. Nato postopoma zmanjšuj razdaljo med skupinami. Primerjaj, pri kateri stopnji prekrivanja posamezna metoda še uspe ločiti skupine. Kaj ohranja MDS in kaj ohranja t-SNE?
+\end{exercise}
+
+\begin{exercise}{Ali lahko zaupamo razdaljam na sliki?}
+Za izbrane pare točk primerjaj njihove razdalje v izvirnem visokorazsežnem prostoru z razdaljami v dvodimenzionalni vložitvi ter poišči primere, kjer bližina ali oddaljenost na sliki daje posebej zavajajoč vtis. Kako bi na vizualizaciji izpostavil ``napačne'' razdalje? Kako bi zgradil uporabniški vmesnik za iskanje teh?
 \end{exercise}
 
 \begin{marginfigure}
@@ -446,4 +458,8 @@ da imajo vsi primeri v originalnem prostoru ``enako'' število sosedov. Poleg te
 Podobno velja tudi za večrazsežno lestvičenje. Čeprav lahko kriterijsko funkcijo minimiziramo z gradientnim sestopom, se v praksi najpogosteje uporablja algoritem SMACOF (angl.~\emph{Scaling by MAjorizing a COmplicated Function}). Ta pristop temelji na ideji majorizacije: namesto da neposredno optimiziramo zahtevno kriterijsko funkcijo, v vsakem koraku zgradimo njeno enostavnejšo zgornjo aproksimacijo, ki jo lahko minimiziramo v zaprti obliki. Tako dobimo iterativen postopek, ki monotonno zmanjšuje vrednost kriterijske funkcije in je praviloma stabilnejši ter hitrejši od preprostega gradientnega sestopa.
 
 Še najbliže praktični rabi je zato morda pristop z vložitvami s silami, kjer že osnovni modeli z vzmetmi in odbojem pogosto dajo uporabne rezultate. A tudi tam v praksi srečamo dodatne izboljšave, kot so uteževanje povezav, prilagajanje jakosti sil skozi čas (t.~i.\ ``ohlajanje'') in hitrejši približni izračuni odbojnih interakcij. Za praktično uporabo je pomembno predvsem to, da posamezni pristopi izhajajo iz različnih ciljev: MDS skuša ohraniti razdalje, t-SNE lokalne soseščine, metode s silami pa ravnovesje med privlačnimi in odbojnimi interakcijami.
+
+\begin{exercise}{Vložitev novih točk.}
+Razširi implementacijo vložitve tako, da pri že naučenih položajih obstoječih primerov poišče položaj nove točke zgolj iz (nekaterih) njenih razdalj oziroma podobnosti do obstoječih primerov, nato pa preveri kakovost postopka tako, da posamezne znane primere začasno odstraniš, jih ponovno vložiš kot nove in primerjaš dobljeni položaj z izvirnim.
+\end{exercise}
 

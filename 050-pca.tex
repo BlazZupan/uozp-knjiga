@@ -108,8 +108,9 @@ class PCA1D:
         return sum(ai * bi for ai, bi in zip(a, b))
 
     def normalize_u(self, eps=1e-8):
-        nrm = (self._dot(self.u, self.u) + eps) ** 0.5
-        self.u = [ui / nrm for ui in self.u]
+        nrm = (sum(v.data * v.data for v in self.u) + eps) ** 0.5
+        for ui in self.u:
+            ui.data /= nrm
 
     def loss(self, xs, ys=None):
         self.normalize_u()
@@ -239,6 +240,10 @@ Avtomobili v našem majhnem podatkovnem naboru razpadejo na nekaj skupin. Na des
 \end{lstlisting}
 
 Največji vpliv ima moč motorja (\texttt{horsepower}), tesno ji sledi poraba električne energije (\texttt{kWh/100 km}), nato pa še pospešek, tip pogona in velikost prtljažnika. Negativni predznaki pri moči, porabi in tipu nakazujejo, da večji, zmogljivejši in praviloma priključni hibridi ležijo na enem koncu osi, medtem ko pozitivni prispevek časa pospeška pomeni, da počasnejši, manj zmogljivi avtomobili ležijo na drugem. Glavna komponenta tako v veliki meri pojasni prehod od manjših, manj zmogljivih in varčnejših vozil k večjim, zmogljivejšim in energijsko zahtevnejšim.
+
+\begin{exercise}{Kaj spremeni standardizacija?}
+Iste podatke analiziraj s PCA pred standardizacijo in po njej, nato primerjaj smeri glavnih komponent in pojasnjeno varianco ter razloži, kateri atributi prevladajo, kadar so njihove merske skale zelo različne.
+\end{exercise}
 
 \section{Varianca v večrazsežnih prostorih}
 
@@ -414,6 +419,10 @@ ter te uporabimo pri interpretaciji dobljene projekcije.
 
 Prvi dve glavni komponenti torej zajameta več kot 90\% celotne variance. Dvodimenzionalna projekcija podatkov zato dobro ohranja strukturo podatkov. Prva komponenta (PC1) v največji meri ločuje vozila glede na zmogljivost in tip pogona, kar se kaže v večjih absolutnih utežeh pri atributih \texttt{Type}, \texttt{Horsepower} in \texttt{kWh/100 km}. Druga komponenta (PC2) pa je izrazito povezana z velikostjo vozila (predvsem \texttt{Trunk Size}), zato v vertikalni smeri razporeja avtomobile glede na prostornost. Na sliki~\ref{fig:cars-2d} tako jasno opazimo skupine vozil: manjši, varčnejši modeli se pojavljajo v zgornjem delu prostora, večji in zmogljivejši (pogosto priključni hibridi) pa v drugem, spodnjem, kar potrjuje, da PCA uspešno razkrije glavne vzorce v podatkih.
 
+\begin{exercise}{Kje so značilke v prostoru glavnih komponent?}
+Vsako značilko predstavi z njenim enotskim vektorjem v izvornem prostoru, vektorje projiciraj na prvi dve glavni komponenti in jih skupaj s primeri izriši v ravnini PCA; iz smeri in dolžine projiciranih vektorjev razloži, katere značilke so povezane s posamezno komponento, katere značilke kažejo v podobne oziroma nasprotne smeri in katere v prvih dveh komponentah skoraj niso zastopane.
+\end{exercise}
+
 \begin{exercise}{Kdaj glavna komponenta sledi šumu?}
 Sestavi podatke z dvema skupinama točk: na začetku naj bosta dobro ločeni v vodoravni smeri, nato postopoma povečuj navpični šum. Za vsako stopnjo šuma izračunaj prvo glavno komponento in jo primerjaj z intuitivno smerjo ločevanja skupin. Opazuj, pri kateri stopnji šuma prva komponenta preneha slediti ločevanju in začne slediti šumu. Poskusi ustvariti primer, kjer PCA popolnoma zgreši intuitivno ``najpomembnejšo'' smer podatkov.
 \end{exercise}
@@ -430,6 +439,10 @@ To je intuitivno že v dveh dimenzijah. Pri podatkih s slike~\ref{fig:data} levo
 
 \begin{exercise}{Koliko variance pojasni prva komponenta pri naključnih podatkih?}
 Ustvari podatkovno množico z desetimi atributi, kjer so vse vrednosti vzorčene neodvisno iz standardne normalne porazdelitve. Atribute standardiziraj in izračunaj PCA. Izmeri delež variance, ki ga pojasni prva komponenta, ter ga primerjaj s teoretično vrednostjo $1/10$. Poskus ponovi za različne velikosti podatkovne množice (npr.\ 20, 50, 100, 500 in 5000 primerov) in za vsako velikost izvedi več ponovitev. Nariši graf povprečne pojasnjene variance prve komponente v odvisnosti od velikosti vzorca. Ali se pri večjih množicah pojasnjena varianca približuje pričakovani vrednosti? Kako se spreminja razlika med prvo in drugo komponento?
+\end{exercise}
+
+\begin{exercise}{Kako stabilne so glavne komponente?}
+Iz iste podatkovne množice večkrat vzorči nekoliko drugačne učne množice, vsakič izračunaj PCA ter primerjaj smeri prvih komponent, da oceniš, pri katerih podatkih so komponente stabilne in kdaj že majhna sprememba vzorca povzroči velik zasuk.
 \end{exercise}
 
 PCA je zato najbolj uporabna takrat, ko med atributi obstajajo korelacije oziroma, širše, kadar podatki ležijo blizu nekega manjrazsežnega podprostora, recimo neke podravnine. V takem primeru glavne komponente kažejo v smeri največje razpršenosti podatkov, torej v smeri, kjer podatki nosijo največ informacije v smislu variance. Delež razložene variance po posamezni komponenti bo toliko večji od \(1/d\), kolikor izrazitejša je ta struktura.
@@ -500,6 +513,10 @@ projekcija podatkov pa nekoliko drugačna:
 Tu morda preseneča lahkota, s katero smo regularizacijo uvedli v metodo analize glavnih komponent. Klasična PCA sicer ima elegantno analitično rešitev\marginnote{PCA, klasično, temelji na lastnem razcepu kovariančne matrike $\Sigma = \tfrac{1}{n}X^\top X$: glavne komponente so lastni vektorji, pripadajoče lastne vrednosti pa podajajo razloženo varianco po posameznih smereh.}, a tak pristop je hkrati precej tog, saj je vezan na točno določeno kriterijsko funkcijo in ortogonalnost komponent. Ko želimo v model vključiti dodatne zahteve, na primer L1- ali L2-regularizacijo, analitična rešitev praviloma ni več na voljo in se moramo vrniti k numerični optimizaciji.
 
 Analizo glavnih komponent lahko razumemo ne le kot zaprto matematično konstrukcijo, temveč tudi kot optimizacijski problem. S tem sicer izgubimo pot do klasične rešitve, a pridobimo tudi precej več svobode: kriterijski funkciji lahko dodajamo člene, ki spodbujajo gladkost, redkost ali druge želene lastnosti komponent. Gradientni sestop zato tu ni le didaktičen približek analitične rešitve, ampak splošnejši okvir, v katerem klasična PCA nastopa le kot njen najpreprostejši primer.
+
+\begin{exercise}{PCA z razredno informacijo.}
+Izberi podatkovno množico za klasifikacijo in kriterijski funkciji PCA dodaj člen, ki nagrajuje večje razdalje med središči posameznih razredov v projekciji; nato postopoma povečuj utež tega člena ter spremljaj, kako se spreminjajo smeri glavnih komponent, delež pojasnjene variance in ločenost razredov v prostoru prvih dveh komponent.
+\end{exercise}
 
 Zgoraj smo uporabili L1 regularizacijo kot primer načina izbora atributov, zmanjšanja kompleksnosti in pomoči pri lažji interpretaciji pomena komponent (uteži). Kako pa je lahko koristna regularizacija L2? Ne pozabimo: podatki, iz katerih gradimo nove, glavne komponente, so lahko šumni
 %

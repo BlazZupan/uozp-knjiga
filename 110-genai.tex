@@ -519,6 +519,14 @@ Rezultati so enaki kot pri prejšnjem bigramskem modelu, ki je temeljil neposred
 %
 To ni presenetljivo: nevronska mreža se je naučila iste statistične strukture podatkov, le da smo verjetnosti sedaj pridobili z učenjem parametrov matrike \texttt{W} in ne neposredno s štetjem frekvenc. Model še vedno temelji le na enem samem predhodnem znaku, zato ostaja zelo omejen in ne zna zajeti širšega konteksta v imenih.
 
+\begin{exercise}{Katero ime je bolj verjetno? Primerjava bigramskega modela in nevronske mreže.}
+Nauči bigramski model in model z nevronsko mrežo. Sestavi testno množico imen, 
+kjer lahko pomešaš slovenska in neka tuja imena, nato z obema modeloma 
+izračunaj povprečno negativno log-verjetnost posameznega imena. Imena razvrsti 
+od najbolj do najmanj verjetnih ter primerjaj, pri katerih imenih se modela
+najbolj razlikujeta in zakaj.
+\end{exercise}
+
 \section{Globoka nevronska mreža: priprava podatkov}
 
 V prejšnjih poglavjih smo zgradili preprost bigramski jezikovni model, kjer smo naslednji znak napovedovali zgolj na podlagi enega samega predhodnega znaka. Tak pristop je intuitiven in enostaven za implementacijo, a omejen: če želimo pri napovedi znaka upoštevati več predhodnih znakov, to je, upoštevati širši kontekst, se velikost verjetnostne tabele (število vrstic) povečuje eksponentno. Za kontekst treh znakov bi tabela imela kar $32^4=1,048,576$ celic, to je, veliko več, kot imamo sploh učnih primerov in bi bila večina celic praznih. Model bi postal redek, popolnoma bi se prilagodil učnim podatkom in slabo bi napovedoval.
@@ -860,6 +868,11 @@ Ta ima vrednost 2.4367. Naslednji trik, ki ga lahko uporabimo je, da zmanjšamo 
 
 S tem smo funkcijo izgube na učnih podatkih še zmanjšali na 2.3552, kar je bolje od bigramov, kjer je bila izguba 2.4470. 
 
+\begin{exercise}{Vpliv velikosti konteksta na točnost modela.}
+Nauči modele, ki naslednji znak napovedujejo iz enega, dveh, treh in več
+predhodnih znakov ter primerjaj njihovo točnost na učnih in testnih podatkih.
+\end{exercise}
+
 \section{Vložitev črk}
 
 Ena ključnih idej modela je uporaba vložitvene matrike $C$, ki vsak znak preslika iz diskretnega indeksa v vektor realnih števil. Namesto da bi znake obravnavali zgolj kot ločene simbole, jih tako predstavimo kot točke v zveznem prostoru. V našem primeru ima matrika:
@@ -870,14 +883,13 @@ kar pomeni, da vsakemu od $32$ znakov priredimo dvodimenzionalni vložitveni vek
 
 Slika~\ref{fig:embedding} prikazuje naučene vložitve črk po učenju modela. Opazimo lahko, da se črke s podobno vlogo v jeziku pogosto razporedijo blizu skupaj. S slke razberemo gručo samoglasnikov, črki x in y sta ločeni od drugih, ločitveni znak \texttt{.} pa je poponoma na svojem. Nekaj podobnega smo morda pričakovali, a je vizualizacija lep prikaz zmožnosti nevronske mreže, da se nauči predstavitev sicer neštevislkih objektov.
 
-\begin{figure}[tbp]
-    \centering
-    \includegraphics[width=\linewidth]{figs/110-embedding.pdf}
-    \vspace*{-10mm}
-    \caption{Vložitev črk v vektorski prostor, kjer smo se vložitve naučili z nevronsko mrežo.
-    \protect\label{fig:embedding}
-    }
-\end{figure}
+\begin{exercise}{Kako so si podobni pari črk?}
+Nauči trigramski model, ki iz dveh predhodnih znakov napoveduje naslednjega,
+nato za vsak par črk vzemi vektor napovedanih verjetnosti naslednjega znaka,
+izračunaj razdalje med temi vektorji ter pare z MDS vloži v ravnino.
+Na karti poišči skupine parov s podobnimi nadaljevanji in razloži
+njihovo jezikovno podobnost.
+\end{exercise}
 
 \section{Generiranje imen}
 
@@ -891,10 +903,12 @@ def generate_name(g):
 
     while True:
         emb = C[torch.tensor([context])]
-        h = torch.tanh(emb.view(1, block_size * embedding_dim) @ W1 + b1)
+        h = torch.tanh(emb.view(1, block_size * embedding_dim) \
+                       @ W1 + b1)
         logits = h @ W2 + b2
         probs = F.softmax(logits, dim=1)
-        ix = torch.multinomial(probs, num_samples=1, generator=g).item()
+        ix = torch.multinomial(probs, num_samples=1, \
+                               generator=g).item()
 
         if ix == ctoi["."]:
             break
@@ -922,7 +936,7 @@ ktjabja
 nru
 \end{lstlisting}
 
-\section{Kam od tu naprej?}
+\section{Kako naprej?}
 
 Zgornji modeli predstavljajo šele začetek sodobnih generativnih modelov. Iz preprostega bigramskega modela smo postopoma prišli do globoke nevronske mreže z vložitvami znakov in širšim kontekstom. A ostaja veliko možnosti za izboljšave. Povečali bi lahko dimenzijo vložitvenega prostora, uporabili daljši kontekst, dodali več skritih plasti ali večje število nevronov ter izboljšali optimizacijo z ustreznejšo izbiro hitrosti učenja, velikosti paketov in regularizacijo. Že takšne spremembe lahko bistveno izboljšajo kvaliteto generiranih imen in zmanjšajo vrednost kriterijske funkcije.
 

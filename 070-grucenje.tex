@@ -536,7 +536,7 @@ te vrste bi morala vključevati tudi informacijo o zaželeni smeri značilk (npr
 \marginnote{S to vajo preveriš, da postopki razlage gruč niso vezani na konkreten algoritem gručenja---delujejo za poljuben, tudi ročno izbran izbor. Problem je sicer tudi ta, da če je izbor naključen, se zna zgoditi, da tudi zanj najdemo pojasnilo in da bo vešč domenski ekspert tudi zanj našel ustrezno domensko razlago. Tipa: zazri se v nočno nebo in najdi strelca.}
 %
 \begin{exercise}{Izmisli si gručo.}
-Izberi poljuben javni podatkovni nabor. Ne uporabi nobene metode gručenja: namesto tega ročno izberi 10--20 primerov, ki se ti zdijo zanimivi, in jih obravnavaj kot gručo. Nato uporabi postopke iz tega poglavja za \emph{razlago} te skupine: rangiranje atributov (zvezne značilke), analizo kategoričnih spremenljivk (npr.\ \(\chi^2\)-test) in obogatenost skupin atributov. Pri interpretaciji preveri, ali rangirane značilke povejo smiselno zgodbo, ali so obogatene skupine značilk skladne s tvojim domenskim znanjem o izbranih primerih, in ali razlage povedo kaj smiselnega. 
+Izberi poljuben prosto dostopen podatkovni nabor. Ročno izberi 10--20 primerov, ki se ti zdijo zanimivi, in jih obravnavaj kot gručo. Nato uporabi postopke iz tega poglavja za \emph{razlago} te skupine: rangiranje atributov (zvezne značilke), analizo kategoričnih spremenljivk (npr.\ \(\chi^2\)-test) in obogatenost skupin atributov. Pri interpretaciji preveri, ali je rangiranje značilk smiselno in ali so obogatene skupine značilk skladne s tvojim domenskim znanjem. 
 \end{exercise}
 
 \begin{exercise}{Razlaga gruč na podatkih o prekinitvi dela.}
@@ -603,6 +603,10 @@ Zgoraj smo se razpisali o razlagah gruč in malce tudi o za to potrebnih uporabn
   \label{tab:grucenje-skupine}
 \end{table*}
 
+\begin{exercise}{Kako stabilne so gruče?}
+Isto podatkovno množico večkrat rahlo spremeni z vzorčenjem primerov ali dodajanjem majhnega šuma, vsakič ponovno izvedi gručenje in primerjaj, kateri pari primerov ostajajo skupaj ter katere gruče se pogosto razcepijo ali združijo.
+\end{exercise}
+
 \section{Hierarhično gručenje}
 
 Hierarhično gručenje gradi hierarhijo gruč iz podatkov. V najpogostejši, t. im. združevalni različici vsak primer na začetku tvori
@@ -664,7 +668,11 @@ Prednost metode je njena učinkovitost in primernost za velike podatkovne množi
   J(v_1,\ldots,v_K)=
   \frac{1}{n}\sum_{i=1}^n \min_{k=1,\ldots,K}\|x_i-v_k\|^2 .
   \]
-  Ustvari nekaj dvodimenzionalnih podatkov z znanimi gručami, voditelje inicializiraj naključno in jih uči z gradientnim sestopom. Po nekaj korakih izriši podatke in trenutne položaje voditeljev. Primerjaj rezultat s klasičnim postopkom metode voditeljev, kjer v vsakem koraku primere najprej dodelimo najbližjemu voditelju, nato pa voditelje nastavimo na povprečja pripadajočih primerov.
+  Ustvari nekaj dvodimenzionalnih podatkov z znanimi gručami, voditelje inicializiraj naključno in jih uči z gradientnim sestopom. Po nekaj korakih izriši podatke in trenutne položaje voditeljev.   Primerjaj rezultat s klasičnim postopkom metode voditeljev, kjer v vsakem koraku primere najprej dodelimo najbližjemu voditelju, nato pa voditelje nastavimo na povprečja pripadajočih primerov.
+\end{exercise}
+
+\begin{exercise}{Kdaj k-means vidi gruče, ki jih ni?}
+Generiraj podatke v obliki obroča, podkve ali dveh podolgovatih skupin, uporabi metodo voditeljev za več vrednosti parametra $k$ ter razloži, kako predpostavka o približno kroglastih gručah vpliva na dobljeno razbitje.
 \end{exercise}
 
 \section{Silhueta}
@@ -716,6 +724,10 @@ Postopek iskanja gruč z algortmom DBSCAN je naslednji:
 \end{enumerate}
 
 DBSCAN lahko odkrije gruče nepravilnih oblik in prepozna osamelce. Glavna slabost te tehnike pa je velika občutljivost rezultatov na izbor parametrov $\varepsilon$ in $minPts$: če je $\varepsilon$ premajhen, tehnika veliko točk prepozna kot osamelce, če je prevelik, pa pride do zduževanja gruč, ki bi morale ostati ločene. DBSCAN deluje slabše tudi takrat, ko imajo različni deli podatkovnega prostora zelo različne gostote.
+
+\begin{exercise}{Kaj se zgodi z osamelci?}
+V podatkovno množico postopoma dodajaj vedno bolj oddaljene osamelce ter primerjaj, kako se nanje odzovejo metoda voditeljev, DBSCAN in silhueta, posebej pa opazuj, ali lahko že nekaj skrajnih primerov bistveno spremeni položaj voditeljev ali oceno kakovosti gručenja.
+\end{exercise}
 
 \section{Gručenje na omrežjih}
 

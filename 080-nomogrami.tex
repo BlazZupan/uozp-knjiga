@@ -125,16 +125,20 @@ z = -15.6 + 0.8 \cdot \text{vadba} + 1.6 \cdot \text{spanje}.
 \]
 Za nove primere dobimo: Sara ima $z=5.5$ in $P(\text{otok}=1)\approx 1.0$, zato je zelo primerna kandidatka za plavanje do otoka; Martin ima $z=-6.7$ in $P(\text{otok}=1)\approx 0.0$, zato mu to odsvetujemo; Leon pa ima $z=0.6$ in $P(\text{otok}=1)\approx 0.6$, kar pomeni, da je blizu odločitvene meje in je odločitev precej negotova.
 
-Dobljeni model lahko predstavimo z nomogramom (slika~\ref{fig:bled-nnomogram}).
+Dobljeni model lahko predstavimo z nomogramom (slika~\ref{fig:bled-nomogram}).
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.8\linewidth]{figs/080-bled-nomogram.pdf }
+    \includegraphics[width=0.8\linewidth]{figs/080-bled-nomogram.pdf}
     \caption{Nomogram za napovedovanja verjentosti plavanja na Blejski otok.}
     \label{fig:bled-nnomogram}
 \end{figure}
 
-Dobljeni model lahko predstavimo z nomogramom (slika~\ref{fig:bled-nnomogram}). Pri tem vsakemu vhodnemu atributu (vadba, spanje) priredimo svojo lestvico, na kateri posamezna vrednost atributa prispeva določeno število točk, sorazmerno z utežjo v linearni kombinaciji. Te točke nato seštejemo v skupni rezultat, ki ustreza vrednosti linearnega napovednega dela $z = x^T\theta$. Ker pa nas pri logistični regresiji ne zanima neposredno $z$, temveč verjetnost, se v naslednjem koraku skupni rezultat preslika še skozi sigmoidno funkcijo, kar v nomogramu običajno ponazorimo z dodatno, nelinearno lestvico na dnu grafa. Tako dobimo celovit vizualni pripomoček, ki omogoča, da brez eksplicitnega računanja najprej ocenimo prispevek posameznih dejavnikov, nato njihovo vsoto in končno še pripadajočo verjetnost razreda. Takšna predstavitev je posebej uporabna v praksi, saj združuje interpretabilnost linearnega modela z intuitivnim razumevanjem verjetnosti: uporabnik lahko neposredno vidi, kako sprememba ene spremenljivke vpliva na končni izid, hkrati pa ohrani občutek za negotovost napovedi, zlasti v bližini odločitvene meje.
+Dobljeni model lahko predstavimo z nomogramom (slika~\ref{fig:bled-nomogram}). Pri tem vsakemu vhodnemu atributu (vadba, spanje) priredimo svojo lestvico, na kateri posamezna vrednost atributa prispeva določeno število točk, sorazmerno z utežjo v linearni kombinaciji. Te točke nato seštejemo v skupni rezultat, ki ustreza vrednosti linearnega napovednega dela $z = x^T\theta$. Ker pa nas pri logistični regresiji ne zanima neposredno $z$, temveč verjetnost, se v naslednjem koraku skupni rezultat preslika še skozi sigmoidno funkcijo, kar v nomogramu običajno ponazorimo z dodatno, nelinearno lestvico na dnu grafa. Tako dobimo celovit vizualni pripomoček, ki omogoča, da brez eksplicitnega računanja najprej ocenimo prispevek posameznih dejavnikov, nato njihovo vsoto in končno še pripadajočo verjetnost razreda. Takšna predstavitev je posebej uporabna v praksi, saj združuje interpretabilnost linearnega modela z intuitivnim razumevanjem verjetnosti: uporabnik lahko neposredno vidi, kako sprememba ene spremenljivke vpliva na končni izid, hkrati pa ohrani občutek za negotovost napovedi, zlasti v bližini odločitvene meje.
+
+\begin{exercise}{Kaj pomeni sprememba ene značilke?}
+Pri logistični regresiji izberi en primer in spreminjaj vrednost posamezne značilke, medtem ko ostale držiš nespremenjene, ter opazuj, kako se spreminjajo linearni napovednik, napovedana verjetnost in položaj na nomogramu.
+\end{exercise}
 
 Model, ki smo ga precej na hitro in morda malo površno uvedli na našem primeru se imenuje logistična regresija. Pomembno je, da tako kot linearna regresija tudi ta model uporablja linearno kombinacijo neodvisnih spremenljivk, katere rezultat pa tokrat, čisto zato, da lahko vrnemo verjetnosti, transformiramo z sigmoidno funkcijo. A postavlja se vprašanje: kako se sploh naučimo ``pravih'' parametrov našega modela, toej vektorja $\theta$? Kakšno kriterijsko funkcijo za to optimiziramo? Iz kakšnih predpostavk ta izhaja? Poznamo poleg linearne in logistične regresije še kakšne druge modele te vrste? In končno, je tudi to moč uporabiti strojno odvajanje in gradientni sestop za učenje modela?
 
@@ -611,6 +615,10 @@ Negativna binomska & cela števila & preveč razpršena štetja & epidemiologija
 \label{tab:glm}
 \end{table}
 
+\begin{exercise}{Kdaj Poissonova regresija premaga linearno?}
+Generiraj podatke, kjer je ciljna spremenljivka nenegativno celo število in njena pričakovana vrednost narašča eksponentno z eno ali več značilkami, nato na istih podatkih nauči linearno in Poissonovo regresijo ter primerjaj njune napovedi, napake in obnašanje pri večjih vrednostih ciljne spremenljivke.
+\end{exercise}
+
 \section{Kaj pa ostale porazdelitve iz eksponentne družine?}
 
 Zgoraj opisane porazdelitve nikakor niso edine, ki jih uporabljamo pri gradnji posplošenih linearnih modelov. Poleg normalne, Bernoullijeve in Poissonove porazdelitve poznamo še vrsto drugih modelov iz eksponentne družine, ki so primerni za različne tipe podatkov in napovednih nalog. Posebej uporabne so takrat, ko ciljna spremenljivka ni zvezna, ni simetrično porazdeljena ali pa je omejena na pozitivne vrednosti oziroma števila dogodkov.
@@ -696,6 +704,10 @@ Optimizacija konvergira sorazmerno hitro, pridobljeni parametri pa se dobro ujem
 >>> model
 LogReg(w0=0.756, w1=1.566, b=-14.822)
 \end{lstlisting}
+
+\begin{exercise}{Nomogram nariši sam.}
+Za naučen model linearne ali logistične regresije iz njegovih uteži samodejno zgradi nomogram (sestavi primerno knjižnico v programu Python), nato na nekaj izbranih primerih preveri, ali ročno seštevanje točk na nomogramu vrne enake napovedi kot model.
+\end{exercise}
 
 % \section{Multinomna logistična regresija}
 

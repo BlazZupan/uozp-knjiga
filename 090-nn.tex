@@ -233,6 +233,14 @@ train(model, X, ys, learning_rate=0.2, n_epochs=2000,
 
 Konvergenca je pri tej implementaciji in naših podatkih kljub naivni implementaciji računanja gradientov razmeroma hitra. Na tem mestu velja poudariti, da je naša implementacija z uporabo knjižnice za avtomatsko odvajanje iz prejšnjih poglavij namenjena predvsem učenju in razumevanju konceptov, za resnejšo uporabo pa bomo od tu dalje posegli po zmogljivejših Pythonovih knjižnicah, kot je \texttt{pytorch}.
 
+\begin{exercise}{Kdaj nevronska mreža premaga linearni model?}
+Sestavi vsaj 5-dimenzionalni klasifikacijski problem z izrazito nelinearno odločitveno mejo, na istih podatkih nauči linearni model (logistična regresija) in nevronsko mrežo z eno skrito plastjo ter primerjaj njuno točnost. 
+\end{exercise}
+
+\begin{exercise}{Kdaj nevronska mreža premaga linearni model pri regresiji?}
+Sestavi regresijski problem z vsaj petimi vhodnimi značilkami in izrazito nelinearno povezavo med vhodom in razredom. Na istih podatkih nauči linearni regresijski model in nevronsko mrežo z eno skrito plastjo ter primerjaj njuno napovedno točnost in prileganje napovedi učnim podatkom.
+\end{exercise}
+
 \section{Regularizacija}
 
 Modeli nevronskih mrež so lahko zelo prilagodljivi in tipično imajo veliko število parametrov, zato so še posebej nagnjeni k preveliki prilagoditvi učni množici. Tako kot pri modelih, ki smo jih obravnavali v prejšnjih poglavjih, lahko tudi tu uporabimo regularizacijske tehnike, s katerimi model omejimo, da se bolje posplošuje na nove, nevidene podatke.
@@ -303,6 +311,10 @@ nakazuje, da globina strogo gledano ni nujna za izrazno moč modela. Vendar pa l
 Globina omogoča nevronskim mrežam gradnjo \emph{kompozicijskih predstavitev}. Vsaka plast transformira izhod prejšnje plasti in iz vhodov postopoma gradi vedno abstraktnejše značilke. Takšna hierarhična struktura pogosto vodi do učinkovitejših predstavitev: funkcije, ki bi v plitvi mreži zahtevale veliko število enot, lahko globoka mreža implementira z bistveno manj parametri. Širina pa določa bogastvo predstavitev znotraj posamezne plasti, saj mreži omogoča učenje več različnih značilk na isti ravni abstrakcije. V praksi tako k izrazni moči modela prispevata tako globina kot širina, njuno ustrezno razmerje pa je odvisno od konkretnega problema.
 
 Skupna \emph{kapaciteta} nevronske mreže, to je, njena sposobnost aproksimacije širokega razreda funkcij, je zato določena z arhitekturo in številom parametrov. Modeli s premajhno kapaciteto bodo preenostavni (angl. {\em underfitting}) in ne bodo zajeli pomembnih vzorcev, medtem ko se lahko preveliki modeli preveč prilagodijo učni množici (angl. {\em overfitting}). Tako kot pri drugih modelih je tudi pri nevronskih mrežah nadzor kapacitete s premišljeno izbiro arhitekture in regularizacijo ključen za dobro uspešnost. V praksi izbiro primerne globine in širine pogosto vodijo eksperimentiranje, domensko znanje in uspešnost na validacijski množici, ne pa stroga teoretična pravila.
+
+\begin{exercise}{Kaj se nauči skrita plast?}
+Sestavi regresijski problem, pri katerem nevronska mreža z dvema skritima plastema doseže dobro napovedno točnost z bistveno manj parametri kot mreža z eno samo skrito plastjo, ter primerjaj, kako široka mora postati enoplastna mreža, da doseže primerljivo napako.
+\end{exercise}
 
 \section{Hitrost učenja in njeno prilagajanje}
 
@@ -410,6 +422,10 @@ Očitno vprašanje je, ali lahko nevronske mreže interpretiramo podobno kot pre
 Vsaj delni vpogled v delovanje nevronskih mrež pa lahko dobimo z analizo njihovih napovedi, opazovanjem, kako se izhodi spreminjajo glede na vhode, ali z vizualizacijo vmesnih predstavitev, kot smo to naredili že v preprostem primeru v tem poglavju. Takšni pristopi omogočajo bolj globalno razumevanje tega, česa se je model naučil, četudi preprosta interpretacija na ravni posameznih parametrov ni na voljo.
 
 V nadaljevanju se zato lotimo dveh pristopov. Prvi bo neposreden: z računskim grafom lahko enostavno ugotovimo, kako vhodne spremenljivke vplivajo na vrednosti izhodnih. Gradiente, izračunane iz računskega grafa, smo do sedaj uporabljali pri osveževanju vrednosti parametrov, a prav tako jih lahko izračunamo za vhodne spremenljivke in s tem dobimo informacijo, kako spremembe vhodnih spremenljivk vplivajo na izhod mreže. Drugi pristop bo namesto gradientov raje spreminjal vhode, jih ``zamajal'', in pogledal, kako se spremeni izhod. Oba pristopa bomo uporabili za razlago vpliva atributov pri izbranem primeru, nekako tako, kot bi uporabili nomogram, le da ga, prvotno, zgradimo za en sam primer. Pregled čez celoten spekter primerov lahko seveda dobimo tako, da tovrstno razlago uporabimo za vse primere v (na primer) testni množici, in tovrstne ``razlage'' grafično prikažemo v vizualizaciji, ki bo za take kompleksnejše modele nadomestila nomogram.
+
+\begin{exercise}{Kaj pove gradient vhoda?}
+Za posamezne primere izračunaj gradient napovedi glede na vhodne značilke, ga uporabi kot lokalno mero pomembnosti značilk ter primerjaj razlage za primere iz različnih delov vhodnega prostora in posebej za primere blizu odločitvene meje.
+\end{exercise}
 
 \section{Shapleyjeve razlage s seštevanjem prispevkov}
 

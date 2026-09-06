@@ -177,6 +177,12 @@ V vsaki iteraciji smo zgradili računski graf za našo izgubo, gradiente paramet
 %
 Gradientni sestop je v nekaj sto iteracijah torej našel (skoraj) pravi model, torej ta s parametri \( w=2 \) in \( b=-1 \). Bralcu tu prepuščamo eksperimente s spremenjeno stopnjo učenja. Povejmo le, da za te podatke in ta model učenje lahko konvergira hitreje, lahko pa z večanjem stopnje učenja pridemo do napake tipa \texttt{`OverflowError: (34, 'Result too large')}. Zakaj?
 
+\begin{exercise}{Kaj naredi osamelec?}
+Ustvari podatke za univariatno linearno regresijo, nato enemu primeru\\
+postopoma povečuj odstopanje od ostalih ter opazuj, kako se spreminjajo\\
+naučena premica, parametra $w$ in $b$ ter vrednost funkcije izgube.
+\end{exercise}
+
 \begin{exercise}{Stopnja učenja in konvergenca.}
 Uporabi iste podatke kot v poglavju (\texttt{random.seed(42)}, \texttt{n=5}, \texttt{ys = [2*x - 1 + ...]}). Za vsako stopnjo učenja iz množice $\{0.001,\ 0.01,\ 0.1,\ 1.0,\ 10.0\}$ zaženi \texttt{train(LinReg(), xs, ys, learning\_rate=..., n\_epochs=200)} in zabeleži končne vrednosti $w$, $b$ ter morebitno napako. Določi največjo stopnjo učenja, pri kateri učenje še konvergira blizu $w \approx 2$ in $b \approx -1$, ter najmanjšo, pri kateri pride do prekoračitve ali očitne divergenc. Na kratko razloži, zakaj prevelik korak gradientnega sestopa pri tej izgubi destabilizira učenje.
 \end{exercise}
@@ -313,6 +319,14 @@ Učenje, kjer funkcija \texttt{train} ostane prav taka kot smo jo razvili v prej
 \end{lstlisting}
 
 V bistvu je kar presenetljivo, s kakšno lahkoto smo našo implementacijo razširili na učenje iz podatkov s poljubnim številom atributov. Še vedno, da opozorimo, uporabljamo knjižnico za strojno odvajanje, ki smo jo razvili v prejšnjem poglavju in ki je tudi za ta naš zadnji ne prav majhnen primer čisto dovolj zmogljiva.
+
+\begin{exercise}{Ista premica, drugačne merske skale\\ spremenljivk.}
+Iste podatke za multivariatno regresijo\\
+predstavi enkrat v prvotnih enotah\\
+in drugič tako, da en atribut pomnožiš z velikim faktorjem,\\
+nato primerjaj hitrost gradientnega sestopa, velikosti naučenih uteži\\
+in napovedi obeh modelov.
+\end{exercise}
 
 \section{Verjetje}
 
@@ -495,5 +509,12 @@ je pravzaprav skladen s pričakovanji: za oceno deleža telesnih maščob je naj
 
 \begin{exercise}{Pomembni in nepomembni atributi.}
 Ustvari podatke po postopku iz multivariatnega primera (\texttt{random.seed(42)}, \texttt{n=1000}, $y$ odvisen le od prvih treh atributov). Podatkom dodaj pet naključnih atributov, ki niso povezanih z $y$. Nauči model \texttt{LinReg(n\_inputs=8)} in atribute razvrsti glede na absolutno vrednost ocenjenih uteži. Preveri, ali so med tremi najvišje uvrščenimi res prvi trije atributi. Kaj opaziš pri preostalih?
+\end{exercise}
+
+\begin{exercise}{Kdaj linearni model ni dovolj?}
+Generiraj podatke iz preproste nelinearne zveze, na primer $y=x^2+\epsilon$,\\
+nanje nauči linearni model ter z grafom napovedi in ostankov pokaži,\\
+kako lahko iz strukture napak prepoznaš, da izbrana oblika modela\\
+ni ustrezna.
 \end{exercise}
  

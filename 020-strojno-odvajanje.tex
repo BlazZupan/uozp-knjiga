@@ -391,6 +391,10 @@ for _ in range(50):
     print(L.data, a.data)
 \end{lstlisting}
 
+\begin{exercise}{Preverjanje gradientov.}
+Napiši splošno funkcijo, ki za poljuben izraz iz \texttt{Value} primerja gradiente, pridobljene z \texttt{backward()}, z numeričnimi ocenami s končnimi diferencami. Preiskusi jo na osnovni implementaciji razreda in na lastnih razširitvah.
+\end{exercise}
+
 \begin{exercise}{Gradientni sestop v dveh spremenljivkah.}
 Poišči minimum funkcije
 \[
@@ -400,3 +404,7 @@ z gradientnim sestopom. Parametra $a$ in $b$ predstavi z vozlišči \texttt{Valu
 \end{exercise}
 
 Tu je čas za bralca, da preskusi delovanje naše kode, jo morda preoblikuje v knjižnico in doda izračun in odvajanje za še kakšne dodatne funkcije. Mi pa se bomo spustili v nove podvige v naslednjem poglavju, ko bomo to kodo za avtomatsko odvajanje uporabili na bolj resnih primerih, kjer bodo (kriterijske) funkcije uporabljale tudi zunanje podatke in na primer tako implementirale iskanje modela za linearno regresijo ali njeno regularizirano inačico. Z zgornjimi, in morda še kakšnimi drugi manjšimi razširitvami, smo sedaj torej pripravljeni za ``resno'' uporabo naše male knjižnice za avtomatsko odvajanje.
+
+\begin{exercise}{Ko se spremenljivka pojavi večkrat.}
+Zgradi več računskih grafov, v katerih se ista spremenljivka pojavi na več mestih (na primer $f(a)=a^2+a^3+2a$) ter preveri in razloži, zakaj se morajo prispevki različnih poti pri vzvratnem prehodu sešteti.
+\end{exercise}

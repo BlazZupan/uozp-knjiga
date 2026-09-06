@@ -276,6 +276,10 @@ Ustvari sintetično regresijsko množico podatkov z nekaj resnično informativni
 Ustvari sintetično regresijsko množico podatkov, pri kateri je ciljna spremenljivka odvisna od treh atributov. V podatke dodaj več atributov, ki so močno korelirani s posameznim izbranim atributom iz originalne množice. Nauči model z L1 regularizacijo pri izbrani stopnji regularizacije $\lambda$. Učenje ponovi večkrat zapored (npr. z različnimi naključnimi začetnimi utežmi). Preveri, ali Lasso med koreliranimi značilkami vedno izbere isto. Kaj ti ugotovitve povejo o razlagi modela z ničelnimi utežmi?
 \end{exercise}
 
+\begin{exercise}{Koliko podatkov potrebujemo za zanesljiv izbor značilk?}
+Na sintetičnih podatkih z nekaj pomembnimi in veliko nepomembnimi značilkami (recimo, 3 pomembne in 50 naključnih značilk) ponovi L1-regulariziran izbor pri različnih velikostih učne množice ter spremljaj, kako pogosto model izbere prave značilke.
+\end{exercise}
+
 
 
 \section{Regularizacija in točnost na učni in testni množici}
@@ -300,7 +304,13 @@ X_train, X_test, y_train, y_test =
    train_test_split(X_norm, ys, test_size=0.95, random_state=42)
 \end{lstlisting}
 
-Podatke smo, kot je razvidno iz zgornjega, pred učenjem tudi standardizirali. Tovrstna normalizacija podatkov nam omogoča hitrejšo konvergenco gradientnega sestopa, saj so vse značilke na po velikosti primerljive in je prostor optimizacije bolj enakomernen, kar preprečuje cik-cakasto napredovanje in pospeši približevanje minimumu. Sledi poskus, kjer model gradimo pri različnih stopnjah regularizacije in izpisujemo točnost tako na učni kot na testni množici:
+Podatke smo, kot je razvidno iz zgornjega, pred učenjem tudi standardizirali. Tovrstna normalizacija podatkov nam omogoča hitrejšo konvergenco gradientnega sestopa, saj so vse značilke na po velikosti primerljive in je prostor optimizacije bolj enakomernen, kar preprečuje cik-cakasto napredovanje in pospeši približevanje minimumu.
+
+\begin{exercise}{Ko je pomembna značilka na napačni skali.}
+Ustvari podatke, kjer imajo atributi zelo različne merske lestvice, primerjaj L1 in L2 regularizacijo pred standardizacijo in po njej ter razloži, zakaj regularizacija brez ustreznega skaliranja lahko neenakovredno kaznuje uteži.
+\end{exercise}
+
+Sledi poskus, kjer model gradimo pri različnih stopnjah regularizacije in izpisujemo točnost tako na učni kot na testni množici:
 
 \vspace*{3mm}
 \begin{lstlisting}
@@ -342,6 +352,10 @@ lambda: 30.00, R2: 0.496 & 0.414, non-zero weights: 1
 \end{lstlisting}
 %
 Popolnoma drugače pa je na testni množici, kjer je model najbolj točen pri regularizaciji z $\lambda=10$. Podobno obnašanje bi dobili tudi pri regularizaciji L2, a to in dodatne poskuse prepuščamo bralcu. Postavi pa se vprašanje, kako poiščemo stopnjo regularizacije tako, da bo ta vodila k modelu, ki bo kar najbolj primeren za nove podatke.
+
+\begin{exercise}{Preveč regularizacije.}
+Na isti učni in testni množici postopoma povečuj $\lambda$ od skoraj nič do zelo velike vrednosti ter izriši učni in testni $R^2$, število neničelnih uteži in poišči območje, kjer regularizacija pomaga, ter točko, kjer začne model zaradi prevelike poenostavitve izgubljati napovedno moč.
+\end{exercise}
 
 \section{Kako poiščemo pravo stopnjo regularizacije}
 

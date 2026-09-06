@@ -10,6 +10,9 @@
 \usepackage{xargs}
 % \renewcommandx{\cite}[3][1={0pt},2={}]{\sidenote[][#1]{\fullcite[#2]{#3}}}
 \usepackage[slovene]{babel}
+\usepackage{ragged2e}
+
+\RaggedRight
 \usepackage{datetime}
 \newcommand{\monthyear}{%
   \ifcase\month
@@ -109,7 +112,8 @@
   skipbelow=1em
 ]
 \small
-\noindent\textsc{Poskusi sam: #1}\par
+\hfuzz=30pt
+{\RaggedRight\textsc{Poskusi sam: #1}\par}
 \vspace{0.7em}
 \noindent\ignorespaces
 }
